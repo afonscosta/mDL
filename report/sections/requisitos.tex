@@ -1,0 +1,69 @@
+
+Os requisitos funcionais abrangidos por esta parte do \textit{standard} para a solução do mDL incluem:
+
+\begin{itemize}
+	\item Capaz de funcionar durante verificação num ambiente \textit{offline} (leitor mDL \textit{offline} e mDL \textit{offline}).
+	\item Capaz de funcionar durante verificação num ambiente \textit{online} (leitor mDL \textit{online} e mDL \textit{online}).
+	\item Inclui mecanismos ou envolve uma arquitetura que permite a partes interessadas na mDL (titular, aplicador da lei ou entidade privada) estabelecer confiança na informação providenciada pela mDL, isto é, ter garantias de que a mDL foi emitida pela alegada autoridade de emissão e que informação não foi alterada.
+	\item Confirmar a ligação entre uma mDL e um titular de mDL.
+	\item Transmitir privilégios de condução.
+	\item Permitir a leitura de informação entre autoridades emissoras.
+	\item Permitir que um titular de mDL autorize a libertação de alguma informação selecionada da mDL para um leitor de mDL.
+\end{itemize}
+
+Para além destes requisitos, existem ainda alguns problemas que as autoridades de emissão deverão resolver, mas que não são abrangidos por esta versão do ISO/IEC 18013-5:
+
+\begin{itemize}
+	\item Mecanismos e tecnologias de armazenamento dos dados da mDL.
+	\item Suporte a aplicações de gestão remota da mDL, pelo titular.
+	\item Referência ao consentimento do utilizador para um titular de mDL controlar interações online com os sistemas da autoridade de emissão.
+\end{itemize}
+
+Existem ainda requisitos técnicos relativos à interface entre uma mDL e um leitor de mDL, que são especificados nesta parte do ISO/IEC 18013:
+
+\begin{itemize}
+	\item Estrutura de dados lógicos com as informações da mDL, quando transferidas entre uma mDL e um leitor mDL, deve respeitar os seguintes aspetos:
+	\begin{itemize}
+		\item Elementos de dados considerados no ISO/IEC 18013-2:
+		\begin{itemize}
+			\item TODO: ISO/IEC 18013-2
+		\end{itemize}
+
+		\item Elementos de dados adicionais:
+		\begin{itemize}
+			\item Inclusão obrigatória da imagem facial do titular.
+			\item Elementos de dados adicionais para "Informação Atualizada".
+			\item Identificador adicional que indica o fator de forma.
+			\item Grupos de dados mDL, utilizados para transferência de informação seletiva (inclui novos elementos de dados).
+		\end{itemize}
+	\end{itemize}
+
+	\item Protocolo de comunicação para troca de dados mDL entre uma mDL e um leitor:
+	\begin{itemize}
+		\item Camada de transmissão:
+		\begin{itemize}
+			\item ISO/IEC 14443 e/ou ISO/IEC 18092 (NFC)
+			\item Interface visual (câmara)
+			\item Wi-Fi \textit{Aware}
+			\item Internet
+			\item \textit{Bluetooth Low Energy} (BLE)
+		\end{itemize}
+		\item Camada de apresentação:
+		\begin{itemize}
+			\item Comandos ISO/IEC 7816-4 e ISO/IEC 7816-8 (TODO: Part 2 and Part 3 of this standard) para o equivalente a \textit{Standard Encoding} para mDL
+			\item Códigos de barras 2D (para estabelecimento de conexão entre dispositivos e o equivalente a \textit{Compact Encoding} para mDL, na transferência de dados da mDL)
+		\end{itemize}
+	\end{itemize}
+
+	\item Mecanismos de proteção de dados para serem aplicados, tendo em conta o ISO/IEC 18013-3 - preservar confidencialidade, integridade e autenticação de dados mDL.
+\end{itemize}
+
+Especificam-se ainda alguns requisitos funcionais relativos a uma aplicação de leitores de mDL, para assegurar a verificação fiável de uma mDL:
+
+\begin{itemize}
+	\item Disponibilidade de verificação de dados (com certificados digitais, por exemplo) de autoridades emissoras, incluindo a definição do modelo de confiança utilizado para uma mDL.
+	\item Sequência de leitura para dados de uma mDL.
+	\item Sequência de verificação para dados de uma mDL.
+\end{itemize}
+
+% TODO: AFONSO - REVER, RESUMIR, MELHORAR
