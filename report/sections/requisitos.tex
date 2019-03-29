@@ -1,17 +1,24 @@
 
-Os requisitos funcionais abrangidos por esta parte do \textit{standard} para a solução do mDL incluem:
+Os requisitos funcionais abrangidos por esta parte do \textit{standard} para a
+solução do mDL incluem:
 
 \begin{itemize}
 	\item Capaz de funcionar durante verificação num ambiente \textit{offline} (leitor mDL \textit{offline} e mDL \textit{offline}).
 	\item Capaz de funcionar durante verificação num ambiente \textit{online} (leitor mDL \textit{online} e mDL \textit{online}).
-	\item Inclui mecanismos ou envolve uma arquitetura que permite a partes interessadas na mDL (titular, aplicador da lei ou entidade privada) estabelecer confiança na informação providenciada pela mDL, isto é, ter garantias de que a mDL foi emitida pela alegada autoridade de emissão e que informação não foi alterada.
+	\item Inclui mecanismos ou envolve uma arquitetura que permite a partes
+	interessadas na mDL (titular, aplicador da lei ou entidade privada)
+	estabelecer confiança na informação providenciada pela mDL, isto é, ter
+	garantias de que a mDL foi emitida pela alegada autoridade de emissão e que
+	informação não foi alterada.
 	\item Confirmar a ligação entre uma mDL e um titular de mDL.
 	\item Transmitir privilégios de condução.
 	\item Permitir a leitura de informação entre autoridades emissoras.
-	\item Permitir que um titular de mDL autorize a libertação de alguma informação selecionada da mDL para um leitor de mDL.
+	\item Permitir que um titular de mDL autorize a libertação de informação especificamente selecionada da mDL para um leitor mDL.
 \end{itemize}
 
-Para além destes requisitos, existem ainda alguns problemas que as autoridades de emissão deverão resolver, mas que não são abrangidos por esta versão do ISO/IEC 18013-5:
+Para além destes requisitos, existem ainda alguns problemas que as autoridades
+de emissão deverão resolver, mas que não são abrangidos por esta versão do
+ISO/IEC 18013-5:
 
 \begin{itemize}
 	\item Mecanismos e tecnologias de armazenamento dos dados da mDL.
@@ -19,7 +26,8 @@ Para além destes requisitos, existem ainda alguns problemas que as autoridades 
 	\item Referência ao consentimento do utilizador para um titular de mDL controlar interações online com os sistemas da autoridade de emissão.
 \end{itemize}
 
-Existem ainda requisitos técnicos relativos à interface entre uma mDL e um leitor de mDL, que são especificados nesta parte do ISO/IEC 18013:
+Existem ainda requisitos técnicos relativos à interface entre uma mDL e um
+leitor mDL, que são especificados nesta parte do ISO/IEC 18013, nomeadamente:
 
 \begin{itemize}
 	\item Estrutura de dados lógicos com as informações da mDL, quando transferidas entre uma mDL e um leitor mDL, deve respeitar os seguintes aspetos:
@@ -32,7 +40,7 @@ Existem ainda requisitos técnicos relativos à interface entre uma mDL e um lei
 		\item Elementos de dados adicionais:
 		\begin{itemize}
 			\item Inclusão obrigatória da imagem facial do titular.
-			\item Elementos de dados adicionais para "Informação Atualizada".
+			\item Elementos de dados adicionais para "Up to Date info".
 			\item Identificador adicional que indica o fator de forma.
 			\item Grupos de dados mDL, utilizados para transferência de informação seletiva (inclui novos elementos de dados).
 		\end{itemize}
@@ -61,7 +69,7 @@ Existem ainda requisitos técnicos relativos à interface entre uma mDL e um lei
 Especificam-se ainda alguns requisitos funcionais relativos a uma aplicação de leitores de mDL, para assegurar a verificação fiável de uma mDL:
 
 \begin{itemize}
-	\item Disponibilidade de verificação de dados (com certificados digitais, por exemplo) de autoridades emissoras, incluindo a definição do modelo de confiança utilizado para uma mDL.
+	\item Disponibilidade de verificação de dados (e.g. certificados digitais) de autoridades emissoras, incluindo a definição do modelo de confiança utilizado para uma mDL.
 	\item Sequência de leitura para dados de uma mDL.
 	\item Sequência de verificação para dados de uma mDL.
 \end{itemize}
