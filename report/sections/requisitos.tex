@@ -3,9 +3,9 @@ Os requisitos funcionais abrangidos por esta parte do \textit{standard} para a
 solução do mDL incluem:
 
 \begin{itemize}
-	\item Capaz de funcionar durante verificação num ambiente \textit{offline} (leitor mDL \textit{offline} e mDL \textit{offline}).
-	\item Capaz de funcionar durante verificação num ambiente \textit{online} (leitor mDL \textit{online} e mDL \textit{online}).
-	\item Inclui mecanismos ou envolve uma arquitetura que permite a partes
+	\item Capcidade de funcionar durante verificação num ambiente \textit{offline} (leitor mDL \textit{offline} e mDL \textit{offline}).
+	\item Capcidade de funcionar durante verificação num ambiente \textit{online} (leitor mDL \textit{online} e mDL \textit{online}).
+	\item Mecanismos ou uma arquitetura que permite a partes
 	interessadas na mDL (titular, aplicador da lei ou entidade privada)
 	estabelecer confiança na informação providenciada pela mDL, isto é, ter
 	garantias de que a mDL foi emitida pela alegada autoridade de emissão e que
@@ -16,16 +16,6 @@ solução do mDL incluem:
 	\item Permitir que um titular de mDL autorize a libertação de informação especificamente selecionada da mDL para um leitor mDL.
 \end{itemize}
 
-Para além destes requisitos, existem ainda alguns problemas que as autoridades
-de emissão deverão resolver, mas que não são abrangidos por esta versão do
-ISO/IEC 18013-5:
-
-\begin{itemize}
-	\item Mecanismos e tecnologias de armazenamento dos dados da mDL.
-	\item Suporte a aplicações de gestão remota da mDL, pelo titular.
-	\item Referência ao consentimento do utilizador para um titular de mDL controlar interações online com os sistemas da autoridade de emissão.
-\end{itemize}
-
 Existem ainda requisitos técnicos relativos à interface entre uma mDL e um
 leitor mDL, que são especificados nesta parte do ISO/IEC 18013, nomeadamente:
 
@@ -34,7 +24,17 @@ leitor mDL, que são especificados nesta parte do ISO/IEC 18013, nomeadamente:
 	\begin{itemize}
 		\item Elementos de dados considerados no ISO/IEC 18013-2:
 		\begin{itemize}
-			\item TODO: ISO/IEC 18013-2
+			\item DG1: elementos de texto (obrigatório).
+			\item DG2: detalhes do titular da licença (opcional).
+			\item DG3: detalhas da autoridade de emissora (opcional).
+			\item DG4: imagem do retrato do titular da licença (opcional).
+			\item DG5: assinatura / imagem de marca habitual (opcional).
+			\item DG6: modelo biométrico facial (opcional).
+			\item DG7: modelo biométrica do dedo (opcional).
+			\item DG8: modelo biométrico da íris (opcional).
+			\item DG9: outro modelo biométrico (opcional).
+			\item DG10: reservado para uso futuro.
+			\item DG11: dados domésticos (opcional).
 		\end{itemize}
 
 		\item Elementos de dados adicionais:
@@ -58,7 +58,7 @@ leitor mDL, que são especificados nesta parte do ISO/IEC 18013, nomeadamente:
 		\end{itemize}
 		\item Camada de apresentação:
 		\begin{itemize}
-			\item Comandos ISO/IEC 7816-4 e ISO/IEC 7816-8 (TODO: Part 2 and Part 3 of this standard) para o equivalente a \textit{Standard Encoding} para mDL
+			\item Comandos ISO/IEC 7816-4 e ISO/IEC 7816-8 (Parte 2 e 3 ) para o equivalente a \textit{Standard Encoding} para mDL
 			\item Códigos de barras 2D (para estabelecimento de conexão entre dispositivos e o equivalente a \textit{Compact Encoding} para mDL, na transferência de dados da mDL)
 		\end{itemize}
 	\end{itemize}
@@ -74,4 +74,4 @@ Especificam-se ainda alguns requisitos funcionais relativos a uma aplicação de
 	\item Sequência de verificação para dados de uma mDL.
 \end{itemize}
 
-% TODO: AFONSO - REVER, RESUMIR, MELHORAR
+Assim sendo, todos estes requisitos são necessários para assegurar a competência do sistema.
