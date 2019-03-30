@@ -18,8 +18,7 @@ incluir:
 \begin{itemize}
 \item uma \emph{message digest} de cada grupo de dados presente na IDL;
 \item uma assinatura digital relativa à coleção de todos as \emph{message digest}. Esta
-assinatura deve usar a chave privada da autoridade emissora (IA). (TODO: É
-a mesma chave privada para todas as IDL emitidas pela mesma IA?)
+assinatura deve usar a chave privada da autoridade emissora (IA).
 \end{itemize}
 
 Posteriormente, quando uma autoridade de leitura (RA) tentar aceder ao
@@ -49,9 +48,11 @@ que pelo menos um dos seguintes aspetos aconteceu:
 \item os dados na IDL foram alterados.
 \end{itemize}
 
-\begin{enumerate}
-\item Funções de Hash
-\label{sec:org2a0f02b}
+
+\vspace{0.6cm}
+\underline{\textbf{Funções de Hash - Codificação \emph{standard}}}
+\vspace{0.3cm}
+
 Para \emph{standard encoding} a IA deve utilizar funções de hash presentes na
 seguinte lista:
 \begin{itemize}
@@ -69,12 +70,24 @@ A mesma função de hash deve ser usada para todos os grupos de dados.
 
 O cálculo do \emph{message digest} deve ser aplicado à concatenação de todos os
 elementos de dados, presentes num dado grupo de dados, pela ordem
-especificada no ISO/IEC 18013-2. (TODO: Ver a ordem)
+especificada no ISO/IEC 18013-2.
 
-\item Método de assinatura
-\label{sec:org4555f78}
+
+\vspace{0.6cm}
+\underline{\textbf{Funções de Hash - Codificação compacta}}
+\vspace{0.3cm}
+
+Neste tipo de codificação não é realizado o calcula do valor de hash para
+cada grupo de dados em particular. Desta forma, não é necessário o uso de
+funções de hash.
+
+
+\vspace{0.6cm}
+\underline{\textbf{Método de assinatura - Codificação \emph{standard}}}
+\vspace{0.3cm}
+
 A assinatura digital do IDL deve ser gerada sobre a concatenação dos
-\emph{message digest} dos grupos de dados presentes. Para tal, a IA pode utilizar
+message digest/ dos grupos de dados presentes. Para tal, a IA pode utilizar
 dois métodos de assinatura diferentes:
 \begin{itemize}
 \item ECDSA
@@ -96,17 +109,69 @@ Por outro lado, caso a IA opte pelo uso do RSA, então deve:
 \begin{itemize}
 \item seguir o RFC 4055, ou seja, escolher o mecanismo RSASSA-PSS (recomendado)
 ou o RSASSA-PKCS1-v1\_5.
-\item garantir que o tamanho mínimo do \emph{modulus} (n) é 1024 bits. (TODO: o que é
-o modulus?)
+\item garantir que o tamanho mínimo do \emph{modulus} (n) é 1024 bits.
 \end{itemize}
 
 Assim sendo, a IA, além do \texttt{EF.COM} e dos grupos de dados mencionados no
-ISO/IEC 18013-2 (TODO: Ver quais são.), deve adicionar um SOD para incluir
+ISO/IEC 18013-2 (DG1 até ao DG11), deve adicionar um SOD para incluir
 as hashes individuais de cada grupo de dados e a assinatura digital no IDL.
 O SOD deve ser do tipo \texttt{SignedData} (RFC 3369) e deve ser produzido no
 formato DER.
 
-\end{enumerate}
+
+\vspace{0.6cm}
+\underline{\textbf{Método de assinatura - Codificação compacta}}
+\vspace{0.3cm}
+
+Neste tipo de codificação, a assinatura digital é gerada sobre a
+totalidade dos dados, ou seja, desde o DG1 até ao DG12 sem contar com o
+DG.SOD e o cabeçalho. O valor é depois armazenado no DG.SOD.
+
+O método usado para assinar deve ser o ECDSA com uma ordem de tamanho
+mínimo de 224 bits. Além disso, de forma a reduzir o armazenamento
+necessário para os parâmetros de domínio deve ser usada uma das seguintes
+curvas:
+
+\begin{itemize}
+\item P-224
+\item P-256
+\item P-384
+\item P-521
+\item brainpoolP224r1
+\item brainpoolP224t1
+\item brainpoolP256r1
+\item brainpoolP256t1
+\item brainpoolP320r1
+\item brainpoolP320t1
+\item brainpoolP384r1
+\item brainpoolP384t1
+\item brainpoolP512r1
+\item brainpoolP512t1
+\end{itemize}
+
+Na prática, o elemento DG.SOD deve ser composto pelos seguintes campos:
+
+\begin{itemize}
+\item DG.SOD.1: assinatura digital (codificada em DER)
+\end{itemize}
+\begin{Verbatim}
+SEQUENCE ::= { r INTEGER, s INTEGER }
+\end{Verbatim}
+\begin{itemize}
+\item DG.SOD.2: chave pública
+\item DG.SOD.3: identificador da curva
+\end{itemize}
+
+Posteriormente, este campo deve ser adicionado aos restantes na seguinte
+ordem: 
+
+\begin{Verbatim}
+[header] x [Data Group 1] x [Data Group 2] x [Data Group 3] x 
+[Data Group4] x [Data Group 7] x [Data Group 11] x 
+[Data Group 12] x [DG.SOD.1 length] [digital signature] x 
+[DG.SOD.2 length] [public key] x [DG.SOD.3: named curve]
+\end{Verbatim}
+
 
 \subsubsection{Autenticação Ativa (ISO/IEC 18013-3)}
 \label{sec:org940f982}
@@ -132,8 +197,7 @@ válida então o SIC foi emitido juntamente com a \emph{machine-readable data}.
 
 O algoritmo do desafio deve respeitar o comando ISO7816 INTERAL AUTHENTICATE
 como definido no ISO/IEC 7816-4:2005. O desafio em si deve corresponder a um
-\texttt{nonce} (RND.IFD) de 8 bytes de comprimento. (TODO: esta descrição corresponde
-ao que está no ISO anterior?)
+\texttt{nonce} (RND.IFD) de 8 bytes de comprimento.
 
 A geração da assinatura por parte do SIC deve usar um dos seguintes métodos:
 \begin{itemize}
@@ -143,7 +207,7 @@ A geração da assinatura por parte do SIC deve usar um dos seguintes métodos:
 
 No caso do primeiro, a assinatura deve respeitar o ISO 9796-2 Digital
 Signature Scheme 1. O M deve ser composto por um nonce de c-4 bits (gerado
-pelo SIC) e por um RND.IFD (TODO: o que é isto?). Deve ser usado o SHA-1 e o
+pelo SIC) e por um RND.IFD. Deve ser usado o SHA-1 e o
 \emph{trailer option 1}. O resultado da geração da assinatura deverá ser a
 assinatura \(\Sigma\), sem a parte da mensagem recuperável M2.
 
@@ -151,7 +215,9 @@ No caso do ECC, a assinatura deve respeitar o ANSI X9.62 ECDSA. O SHA-1 deve
 ser usado como algoritmo de hash e o resultado da geração da assinatura deve
 ser um DER com dois inteiros (r e s) codificados em ASN.1:
 
+\begin{Verbatim}
 SEQUENCE ::= \{ r INTEGER, s INTEGER \}
+\end{Verbatim}
 
 \subsubsection{Proteção de acesso básico (BAP)}
 \label{sec:orgd21bd93}
