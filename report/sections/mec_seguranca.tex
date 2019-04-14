@@ -173,89 +173,27 @@ ordem:
 \end{Verbatim}
 
 
-\subsubsection{Autenticação Ativa (ISO/IEC 18013-3)}
-\label{sec:org940f982}
-A autenticação ativa tem como objetivo confirmar que a \emph{secure integrated
-chip} (SIC) foi emitido juntamente com a \emph{machine-readable data}.
+\subsubsection{Outros mecanismos}
 
-O processo a partir do qual esta confirmação é realizada, baseia-se num
-protocolo \emph{challenge-response}. Este admite que cada SIC tem um par de chaves.
-Por um lado, a chave privada encontra-se armazenada na memória segura do SIC
-e não pode ser copiada. Por outro lado, a chave pública é armazenada no
-grupo de dados DG13, no formato da estrutura \texttt{SubjectPublicKeyInfo} (RFC 3280)
-e deve ser produzido no seguinte formato \texttt{DER}:
+Além dos mecanismos de segurança anteriormente mencionados, existe ainda 
+um conjunto de outros como:
 
-\begin{center}
-\includegraphics[width=.9\linewidth]{./images/subjectPublicKeyInfo_der.jpeg}
-\end{center}
-
-Na prática, o sistema de inspeção (IS) que quiser validar a autenticidade do
-SIC deverá criar um desafio escolhido aleatoriamente e enviar ao SIC para
-que este o assine com a chave privada e devolva o resultado. Posteriormente,
-o IS valida a assinatura com a chave pública do SIC. Se a assinatura for
-válida então o SIC foi emitido juntamente com a \emph{machine-readable data}.
-
-O algoritmo do desafio deve respeitar o comando ISO7816 INTERAL AUTHENTICATE
-como definido no ISO/IEC 7816-4:2005. O desafio em si deve corresponder a um
-\texttt{nonce} (RND.IFD) de 8 bytes de comprimento.
-
-A geração da assinatura por parte do SIC deve usar um dos seguintes métodos:
 \begin{itemize}
-\item RSA
-\item ECC
+    \item \textbf{Autenticação ativa}. Tem como objetivo confirmar que a \emph{secure integrated chip} (SIC) foi emitido juntamente com a \emph{machine-readable data}.
+    \item \textbf{Proteção de acesso básico (BAP)}. Tem como objetivo verificar que o IS tem acesso ao \emph{proximity integrated circuit card} (PICC) antes de aceder aos dados guardados no seu interior. Adicionalmente, o BAP assegura que a comunicação entre o IS e o PICC é protegida. 
+    \item \textbf{Proteção de acesso extendido (EAP)}. Tem como objetivo permitir o acesso condicional autenticado a certos grupos de dados.
 \end{itemize}
 
-No caso do primeiro, a assinatura deve respeitar o ISO 9796-2 Digital
-Signature Scheme 1. O M deve ser composto por um nonce de c-4 bits (gerado
-pelo SIC) e por um RND.IFD. Deve ser usado o SHA-1 e o
-\emph{trailer option 1}. O resultado da geração da assinatura deverá ser a
-assinatura \(\Sigma\), sem a parte da mensagem recuperável M2.
+Apesar destes mecanismos se encontrarem no documento ISO, utilizam dispositivos físicos 
+em algum momento do seu processo. Dado que o objetivo é focar num sistema 
+completamente digital optou-se por não aborda-los.
 
-No caso do ECC, a assinatura deve respeitar o ANSI X9.62 ECDSA. O SHA-1 deve
-ser usado como algoritmo de hash e o resultado da geração da assinatura deve
-ser um DER com dois inteiros (r e s) codificados em ASN.1:
-
-\begin{Verbatim}
-SEQUENCE ::= \{ r INTEGER, s INTEGER \}
-\end{Verbatim}
-
-\subsubsection{Proteção de acesso básico (BAP)}
-\label{sec:orgd21bd93}
-A proteção básica de acesso tem como objetivo verificar que o IS tem acesso
-ao \emph{proximity integrated circuit card} (PICC) antes de aceder aos dados
-guardados no seu interior. Adicionalmente, o BAP assegura que a comunicação
-entre o IS e o PICC é protegida. 
-
-Desta forma, o acesso aos dados por parte do IS só é permitido depois de
-este assegurar que tem autorização para o fazer. Para que tal aconteça, este
-deve sujeitar-se a um protocolo de \emph{challenge-response}. Na prática, IS prova
-que tem conhecimento das chaves de acesso básico aos documentos que
-pertencem ao PICC e são derivadas a partir do \emph{input} do desafio.
-Consequentemente, é originada uma chave de sessão que permite a existência
-de uma comunicação segura (\emph{Secure Messaging}).
-
-(TODO: Mais info? Anexo B da parte 3)
-
-\subsubsection{Proteção de acesso extendido (EAP)}
-\label{sec:org6117d54}
-A proteção de acesso extendido tem como objetivo permitir o acesso
-condicional autenticado a certos grupos de dados.
-(TODO: é para falar disto?)
-\subsubsection{PACE}
-\label{sec:org54755e3}
-\begin{itemize}
-\item Quando uma \emph{password} de acesso ao mDL não é partilhada por uma interface
-de comunicação separada, usa-se um mecanismo que suporte a criação de uma
-chave efémera forte (e.g. PACE ou EAC).
-
-Anexo I substitui ISO 18013-3 Anexo C.
-(TODO: é para falar disto?)
-\end{itemize}
 
 \subsection{Controlos de privacidade}
 \label{sec:org1279156}
 \subsubsection{Consentimento do utilizador}
 \label{sec:orga2915d6}
+
 O acesso, por parte de um dispositivo de leitura, aos dados guardados numa
 mDL, apenas deve ser permitido depois do consentimento (implícito ou
 explícito) do mDL \emph{holder}.
