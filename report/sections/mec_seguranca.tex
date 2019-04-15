@@ -13,18 +13,17 @@ Na prática, este mecanismo é implementado usando criptografia de chave
 pública (assimétrica) para produzir assinaturas digitais sobre
 \emph{machine-readable data}.
 
-De facto, se for usado \emph{standard encoding}, a \emph{machina-readable data} deve
-incluir:
+De facto, se for usado \emph{standard encoding}, a \emph{machine-readable data} deve incluir:
 \begin{itemize}
 \item uma \emph{message digest} de cada grupo de dados presente na IDL;
-\item uma assinatura digital relativa à coleção de todos as \emph{message digest}. Esta
+\item uma assinatura digital relativa à coleção de todas as \emph{message digest}. Esta
 assinatura deve usar a chave privada da autoridade emissora (IA).
 \end{itemize}
 
 Posteriormente, quando uma autoridade de leitura (RA) tentar aceder ao
 conteúdo da IDL, esta deve realizar os seguintes passos:
 \begin{itemize}
-\item verificar a assinatura digital utilizando a chave pública da IA.
+\item verificar a assinatura digital utilizando a chave pública da IA;
 \item computar o \emph{message digest} para cada um dos grupos de dados que sejam de
 interesse e comparar o seu resultado com os respetivos \emph{message digest}
 guardados no \emph{machine-readable data} do IDL.
@@ -40,7 +39,7 @@ considerar que os grupos de dados que quer ler são autenticos se:
 assinatura, pertence efetivamente à IA que emitiu a IDL.
 \end{itemize}
 
-No entanto, caso algum dos passos anteriores não for válido, então significa
+No entanto, caso algum dos passos anteriores não seja válido, então significa
 que pelo menos um dos seguintes aspetos aconteceu:
 \begin{itemize}
 \item a assinatura digital não foi verificada com sucesso;
@@ -77,7 +76,7 @@ especificada no ISO/IEC 18013-2.
 \underline{\textbf{Funções de Hash - Codificação compacta}}
 \vspace{0.3cm}
 
-Neste tipo de codificação não é realizado o calcula do valor de hash para
+Neste tipo de codificação não é realizado o cálculo do valor de hash para
 cada grupo de dados em particular. Desta forma, não é necessário o uso de
 funções de hash.
 
@@ -87,7 +86,7 @@ funções de hash.
 \vspace{0.3cm}
 
 A assinatura digital do IDL deve ser gerada sobre a concatenação dos
-message digest/ dos grupos de dados presentes. Para tal, a IA pode utilizar
+\textit{message digest} dos grupos de dados presentes. Para tal, a IA pode utilizar
 dois métodos de assinatura diferentes:
 \begin{itemize}
 \item ECDSA
@@ -132,6 +131,7 @@ mínimo de 224 bits. Além disso, de forma a reduzir o armazenamento
 necessário para os parâmetros de domínio deve ser usada uma das seguintes
 curvas:
 
+\begin{multicols}{2}
 \begin{itemize}
 \item P-224
 \item P-256
@@ -148,6 +148,7 @@ curvas:
 \item brainpoolP512r1
 \item brainpoolP512t1
 \end{itemize}
+\end{multicols}
 
 Na prática, o elemento DG.SOD deve ser composto pelos seguintes campos:
 
@@ -175,11 +176,10 @@ ordem:
 
 \subsubsection{Outros mecanismos}
 
-Além dos mecanismos de segurança anteriormente mencionados, existe ainda 
-um conjunto de outros como:
+Além dos mecanismos de segurança anteriormente mencionados, existem ainda outros, como:
 
 \begin{itemize}
-    \item \textbf{Autenticação ativa}. Tem como objetivo confirmar que a \emph{secure integrated chip} (SIC) foi emitido juntamente com a \emph{machine-readable data}.
+    \item \textbf{Autenticação ativa}. Tem como objetivo confirmar que o \emph{secure integrated chip} (SIC) foi emitido juntamente com a \emph{machine-readable data}.
     \item \textbf{Proteção de acesso básico (BAP)}. Tem como objetivo verificar que o IS tem acesso ao \emph{proximity integrated circuit card} (PICC) antes de aceder aos dados guardados no seu interior. Adicionalmente, o BAP assegura que a comunicação entre o IS e o PICC é protegida. 
     \item \textbf{Proteção de acesso extendido (EAP)}. Tem como objetivo permitir o acesso condicional autenticado a certos grupos de dados.
 \end{itemize}
@@ -196,7 +196,7 @@ completamente digital optou-se por não aborda-los.
 
 O acesso, por parte de um dispositivo de leitura, aos dados guardados numa
 mDL, apenas deve ser permitido depois do consentimento (implícito ou
-explícito) do mDL \emph{holder}.
+explícito) do mDL \emph{\hl{holder}}.
 
 Os métodos para o consentimento do utilizador não fazem parte dos temas
 abrangidos neste documento.

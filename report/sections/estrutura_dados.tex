@@ -1,17 +1,26 @@
 A estrutura de dados mDL é codificada como um conjunto de objetos de dados BER-TLV e pode ser apresentada em dois formatos: \textit{standard encoding} e \textit{compact encoding}.
 
+% TODO: Explicar BER-TLV
+
 \subsection{\textit{Standard encoding}}
 
-%O \textit{standard encoding} do mDL é constituído por três componentes primários: A estrutura de ficheiros, o conjunto de comandos e os grupos de dados que o consituem.
+%O \textit{standard encoding} do mDL é constituído por três componentes primários: A estrutura de ficheiros, o conjunto de comandos e os grupos de dados que o constituem.
 
 \subsubsection{Estrutura de ficheiros}
 
-A estrutura de dados lógica do mDL é constituída por um conjunto de ficheiros elementares, cada um deles contendo um ou mais grupos de dados. Cada um destes pode ser classificado como obrigatório, opcional ou condicional (dependendo do suporte providenciado) na implementação do mDL. Relativamente à permissão de acesso a um dado ficheiro é necessário indicar se o consentimento explícito é requirido do titular mDL.
+A estrutura de dados lógica do mDL é constituída por um conjunto de ficheiros elementares, cada um deles contendo um ou mais grupos de dados. Cada um destes pode ser classificado como obrigatório, opcional ou condicional (dependendo do suporte providenciado) na implementação do mDL. Relativamente à permissão de acesso a um dado ficheiro, é necessário indicar se o consentimento explícito é requerido do titular mDL.
+
+Na tabela \ref{table:ficheiros_elementares} são identificados os vários conjuntos de ficheiros elementares que constituem a estrutura de dados lógica do mDL.
 
 \begin{table}[H]
+\centering
+\caption{Conjunto de ficheiros elementares.}
+\label{table:ficheiros_elementares}
+\vspace{0.2cm}
 \begin{tabular}{|l|l|l|}
 \hline
-Ficheiro Elementar & Presença & Consentimento \\ \hline
+\rowcolor[HTML]{EFEFEF}
+\textbf{Ficheiro Elementar} & \textbf{Presença} & \textbf{Consentimento} \\ \hline
 Data group 1 & Obrigatória & Explícito \\ \hline
 Data group 2-4 & Opcional & Explícito \\ \hline
 Data group 5 & \begin{tabular}[c]{@{}l@{}}Opcional\\ (Não recomendado)\end{tabular} & Explícito \\ \hline
@@ -40,25 +49,30 @@ EF.GroupAccess & Obrigatória &  \\ \hline
 
 Os comandos de uma aplicação mDL cumprem a norma ISO/IEC 18013-2. Cada comando toma a forma de uma mensagem que será transmitida a um recipiente, sendo constituída por um cabeçalho e um corpo.
 
-O cabeçalho é constituído por quatro \textit{bytes}, cada um dos quais indicando um de campos, presentes na seguinte ordem:
+O cabeçalho é constituído por quatro \textit{bytes}, cada um dos quais indicando um campo, presentes na seguinte ordem:
 \begin{itemize}
-    \item O byte Class (CLA) que, como o nome indica, especifica a classe, interindustria ou proprietária, do comando a executar. Indica também, caso se trate de um comando de classe interindústria, se se pretende executar \textit{chaining} de comandos e respostas (e.g. transmissão de uma \textit{string} demasiado longa para um único comando). Adicionalmente, indica se se pretende utilizar um canal seguro para a transmissão de dados e o respetivo formato. Por fim, é indicado o canal lógico sobre o qual a transmissão será efetuada.
+    \item O \textit{byte Class} (CLA) que, como o nome indica, especifica a classe, interindústria ou proprietária, do comando a executar. Indica também, caso se trate de um comando de classe interindústria, se se pretende executar \textit{chaining} de comandos e respostas (e.g. transmissão de uma \textit{string} demasiado longa para um único comando). Adicionalmente, indica se se pretende utilizar um canal seguro para a transmissão de dados e o respetivo formato. Por fim, é indicado o canal lógico sobre o qual a transmissão será efetuada.
 
-    \item O byte Instruction (INS), que especifica exatamente qual comando será processado. Existe uma variedade de comandos providenciados pela norma ISO/IEC 18013-2. Para além dos comandos especificados na norma, é especificado um comando adicional UPDATE BINARY, que atualiza o ficheiro EF.GroupAccess.%Há 40 comandos na norma mais o UPDATE BINARY, põe-se nos anexos?
+    \item O \textit{byte Instruction} (INS), que especifica exatamente qual comando será processado. Existe uma variedade de comandos providenciados pela norma ISO/IEC 18013-2. Para além dos comandos detalhados na norma, é especificado um comando adicional \textit{UPDATE BINARY}, que atualiza o ficheiro EF.GroupAccess.%Há 40 comandos na norma mais o UPDATE BINARY, põe-se nos anexos?
 
-    \item Os bytes Parameter 1 e 2 (P1 e P2), que indicam controlos e opções para o processamento do comando.
+    \item Os \textit{bytes Parameter} 1 e 2 (P1 e P2), que indicam controlos e opções para o processamento do comando.
 \end{itemize}
 
 
 \subsubsection{Grupos de dados}
 
-Os dados mDL são organizado em 11 grupos de dados de acordo com a norma ISO/IEC 18013-2, com algumas alterações. 
+Os dados mDL são organizado em 11 grupos de dados, de acordo com a norma ISO/IEC 18013-2, com algumas alterações. 
 
-O primeiro grupo de dados (DG 1) é responsável por guardar o conjunto mínimo de dados essenciais para identificação internacional, com a exceção da assinatura e foto do indivíduo. Os grupos de dados 6 e 10, são feitos obrigatórios na implementação do mDL. 
+O primeiro grupo de dados (DG 1) é responsável por guardar o conjunto mínimo de dados essenciais para identificação internacional, com a exceção da assinatura e foto do indivíduo. Os grupos de dados 6 e 10, tornam-se obrigatórios na implementação do mDL. 
 
 \begin{table}[H]
+\centering
+\caption{Grupos de dados do mDL.}
+\label{table:grupos_dados}
+\vspace{0.2cm}
 \begin{tabular}{|l|l|}
 \hline
+\rowcolor[HTML]{EFEFEF}
 Ficheiro Elementar & Conteúdo \\ \hline
 Data group 1 & Elementos obrigatórios \\ \hline
 Data group 2 & Detalhes do titular \\ \hline
@@ -74,10 +88,10 @@ Data group 11 & Dados domésticos \\ \hline
 \end{tabular}
 \end{table}
 
-Para além destes, são introduzidos os grupos de dados opcionais 32 a 127, que permitirão a autorização seletiva da informação mDL ao leitor. Quaisquer destes grupos que contenha dados é introduzido no elemento EF.SOD. É introduzido também o elemento EF.GroupAccess, que contem a informação sobre quais grupos de dados são disponibilizados ao leitor mDL.
+Para além destes, são introduzidos os grupos de dados opcionais 32 a 127, que permitirão a autorização seletiva de informação mDL para ser fornecida ao leitor. Quaisquer destes grupos que contenha dados é introduzido no elemento EF.SOD. É incluído também o elemento EF.GroupAccess, que contém informação sobre que grupos de dados são disponibilizados ao leitor mDL.
 
 \subsection{\textit{Compact encoding}}
 
-O \textit{Compact encoding} é o esquema de dados utilizado na transferência de informação por meio de uma interface ótica, tais como códigos de barras ou tiras magnéticas. Estes requerem um espaço de armazenamento entre 300 B e 5 kB. Devido a esta limitação, o número de grupos de dados é restrito, bem como o espaço permitido para cada um.
+O \textit{Compact encoding} é o esquema de dados utilizado na transferência de informação por meio de uma interface ótica, tais como códigos de barras ou fitas magnéticas. Estes requerem um espaço de armazenamento entre 300 B e 5 kB. Devido a esta limitação, o número de grupos de dados é restrito, bem como o espaço permitido para cada um.
 
 O esquema do \textit{compact encoding} providencia espaço para os grupos de dados 1, 6 e 10 obrigatoriamente, bem como a possibilidade da utilização dos grupos 2, 3, 4, 7 e 11, caso necessário.
