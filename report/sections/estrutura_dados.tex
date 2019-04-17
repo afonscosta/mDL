@@ -90,6 +90,76 @@ Data group 11 & Dados domésticos \\ \hline
 
 Para além destes, são introduzidos os grupos de dados opcionais 32 a 127, que permitirão a autorização seletiva de informação mDL para ser fornecida ao leitor. Quaisquer destes grupos que contenha dados é introduzido no elemento EF.SOD. É incluído também o elemento EF.GroupAccess, que contém informação sobre que grupos de dados são disponibilizados ao leitor mDL.
 
+Por motivos de simplicidade, e tendo em conta que se pretende implementar apenas os campos obrigatórios do mDL, serão apenas aprofundadas as constituições dos elementos DG1, DG6, DG10, EF.COM, EF.SOD e EF.GroupAcess.
+
+\subsubsection{Data group 1}
+
+Este ficheiro elementar contém os dados demográficos do titular, bem como as categorias de veículo para os quais este tem qualificações e é identificado pela \textit{tag} \texttt{'61'} e o identificador \texttt{'01'}, seguido pelo comprimento total desto grupo. Como a totalidade da informação contida neste é obrigatória e encontra-se numa ordem fixa, a informação demográfica encontra-se concatenada num único objeto com a \textit{tag} \texttt{'5F1F'} seguida do comprimento da mesma. 
+
+De tal modo, sabendo que cada campo de tamanho variável é precedido pelo respetivo valor de comprimento, os dados demográficos seguem a seguinte estrutura:
+
+\begin{table}[H]
+\begin{tabular}{|c|c|c|c|}
+\hline
+\rowcolor[HTML]{EFEFEF} 
+{\color[HTML]{333333} Nome} & {\color[HTML]{333333} \begin{tabular}[c]{@{}c@{}}Tamanho Variável/\\ Fixo\end{tabular}} & {\color[HTML]{333333} Formato} & {\color[HTML]{333333} Exemplo} \\ \hline
+Nome Próprio & Variável & Até 36 letras e/ou símbolos & Smithe-Williams \\ \hline
+Apelidos & Variável & Até 36 letras e/ou símbolos & Alexander George Thomas \\ \hline
+\begin{tabular}[c]{@{}c@{}}Data de nascimento\\ (yyyymmdd)\end{tabular} & Fixo & 8 números & 19700301 \\ \hline
+\begin{tabular}[c]{@{}c@{}}Data de emissão\\ (yyyymmdd)\end{tabular} & Fixo & 8 números & 20020915 \\ \hline
+\begin{tabular}[c]{@{}c@{}}Data de expiração\\ (yyyymmdd)\end{tabular} & Fixo & 8 números & 20070930 \\ \hline
+País emissor & Fixo & 3 letras & JPN \\ \hline
+Autoridade emissora & Variável & Até 65 letras, números e/ou símbolos & \begin{tabular}[c]{@{}c@{}}HOKKAIDO PREFECTURAL \\ POLICE ASAHIKAWA AREA\\ PUBLIC SAFETY COMMISSION\end{tabular} \\ \hline
+Número de licença & Variável & Até 65 letras e/ou números & A290654395164273X \\ \hline
+\end{tabular}
+\end{table}
+
+Por sua vez, cada uma das qualificações de veículo é codificada com a \textit{tag} \texttt{'7F63'}, seguida pelo comprimento total da lista e pelo número de entradas da mesma, codificado com a \textit{tag} \texttt{'02'}. Cada elemento da lista é codificado com a \textit{tag} \texttt{'87'} seguida pelo comprimento do elemento.
+
+
+
+\subsubsection{Data group 6}
+
+Este grupo é responsável pelo armazenamento de uma variedade de identificadores biométricos do titular. No entanto, por motivos de simplicidade, assume-se que apenas a foto estará presente. Este ficheiro é identificado pela \textit{tag} \texttt{'75'} e o identificador \texttt{'06'}, seguido pelo comprimento total do grupo. A seguir segue a seguinte formatação:
+
+\begin{table}[H]
+\begin{tabular}{|c|c|c|}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+Tag & Comprimento & Valor \\ \hline
+'7461' & Variável & Informação dos subgrupos biométricos \\ \hline
+'02' & Variável & \begin{tabular}[c]{@{}c@{}}Número de subgrupos biométricos do grupo\\ \\ (no contexto do Projeto, 1)\end{tabular} \\ \hline
+'7F60' & Variável & Subgrupo biométrico \\ \hline
+'A1' & Variável & Header do subgrupo biométrico (BHT) \\ \hline
+'80' & 02 & Versão da header \\ \hline
+'86' & 02 & \begin{tabular}[c]{@{}c@{}}BDB product owner, product type\\ (2 números positivos concatenados)\end{tabular} \\ \hline
+'87' & 02 & \begin{tabular}[c]{@{}c@{}}BDB format owner\\ (1 número positivo)\end{tabular} \\ \hline
+'88' & 02 & \begin{tabular}[c]{@{}c@{}}BDB format type\\ (1 número positivo)\end{tabular} \\ \hline
+'5F2E' & Variável & \begin{tabular}[c]{@{}c@{}}Bloco de dados biométrico\\ (formato definido pelos dois anteriores)\end{tabular} \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+\subsubsection{Data group 10}
+
+Este grupo é responsável por guardar os dados obrigatórios mDL, sendo identificado pela \textit{tag} \texttt{'62'} e o identificador \texttt{'0A'}, seguido pelo comprimento total do grupo. Seguem-se então os seguintes parâmetros:
+
+\begin{table}[H]
+\begin{tabular}{|c|c|c|}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+Tag & Comprimento & Valor \\ \hline
+02 & 01 & Versão do mDL \\ \hline
+'5F28' & 07 & \begin{tabular}[c]{@{}c@{}}Data do último update. Timestamp em UTC,\\  no formato YYYYMMDDhhmmss\end{tabular} \\ \hline
+'5F2B' & 07 & \begin{tabular}[c]{@{}c@{}}Data de expiração do mDL. Timestamp em UTC,\\  no formato YYYYMMDDhhmmss\end{tabular} \\ \hline
+'5F38' & 07 & \begin{tabular}[c]{@{}c@{}}Data do próximo update. Timestamp em UTC,\\  no formato YYYYMMDDhhmmss\end{tabular} \\ \hline
+'5F39' & Variável & \begin{tabular}[c]{@{}c@{}}Informação de gestão mDL para autoridades,\\ string de octetos\end{tabular} \\ \hline
+\end{tabular}
+\end{table}
+
+
+
 \subsection{\textit{Compact encoding}}
 
 O \textit{Compact encoding} é o esquema de dados utilizado na transferência de informação por meio de uma interface ótica, tais como códigos de barras ou fitas magnéticas. Estes requerem um espaço de armazenamento entre 300 B e 5 kB. Devido a esta limitação, o número de grupos de dados é restrito, bem como o espaço permitido para cada um.
