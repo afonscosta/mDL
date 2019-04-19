@@ -1,63 +1,67 @@
 {
-    "DG1": {
-        "tag": "61",
-        "length": "var",
-        "content": {
-            "demographic": {
-                "tag": "5F1F",
-                "length": "var",
-                "content": {
-                    "family_name": {
-                        "length": "var",
-                        "constraints": "[\\s\\w]{1,36}"
-                    },
-                    "given_names": {
-                        "length": "var",
-                        "constraints": "[\\s\\w]{1,36}"
-                    },
-                    "date_of_birth": {
-                        "length": 8,
-                        "constraints": "\\d{8}"
-                    },
-                    "date_of_issue": {
-                        "length": 8,
-                        "constraints": "\\d{8}"
-                    },
-                    "date_of_expiry": {
-                        "length": 8,
-                        "constraints": "\\d{8}"
-                    },
-                    "issuing_country": {
-                        "length": 3,
-                        "constraints": "\\w{3}"
-                    },
-                    "issuing_authority": {
-                        "length": 65,
-                        "constraints": "[\\s\\w\\d]{1,65}"
-                    },
-                    "licence_number": {
-                        "length": 25,
-                        "constraints": "[\\w\\d]{1,25}"
-                    }
+    "tag": "61",
+    "length": "var",
+    "content": {
+        "demographic": {
+            "tag": "5F1F",
+            "length": "var",
+            "content": {
+                "family_name": {
+                    "length": "var",
+                    "constraints": "[\\s\\w]{1,36}"
+                },
+                "name": {
+                    "length": "var",
+                    "constraints": "[\\s\\w]{1,36}"
+                },
+                "date_of_birth": {
+                    "length": 4,
+                    "constraints": "\\d{8}",
+                    "encode": "NO_ENCODE"
+                },
+                "date_of_issue": {
+                    "length": 4,
+                    "constraints": "\\d{8}",
+                    "encode": "NO_ENCODE"
+                },
+                "date_of_expiry": {
+                    "length": 4,
+                    "constraints": "\\d{8}",
+                    "encode": "NO_ENCODE"
+                },
+                "issuing_country": {
+                    "length": 3,
+                    "constraints": "\\w{3}"
+                },
+                "issuing_authority": {
+                    "length": "var",
+                    "constraints": "[\\s\\w\\d]{1,65}"
+                },
+                "license_number": {
+                    "length": "var",
+                    "constraints": "[\\w\\d]{1,25}"
                 }
-            },
-            "categories_of_vehicles": {
-                "tag": "7F63",
-                "length": "var",
-                "content": {
-                    "number_of_entries": {
-                        "tag": "02",
-                        "length": 1,
-                        "constraints": "(\\d|\\d{2}|1\\d{2}|2[0-4]\\d|25[0-5])"
-                    },
-                    "content_list": {
-                        "size_list": "number_of_entries",
-                        "tag": "87",
-                        "length": "var",
-                        "constraints": "verify_category()"
-                    }
+            }
+        },
+        "categories_list": {
+            "tag": "7F63",
+            "length": "var",
+            "content": {
+                "number_of_entries": {
+                    "tag": "02",
+                    "length": "var",
+                    "constraints": "(\\d|\\d{2}|1\\d{2}|2[0-4]\\d|25[0-5])",
+                    "decode": "int"
+                },
+                "categories_of_vehicles": {
+                    "size_list": "number_of_entries",
+                    "tag": "87",
+                    "length": "var",
+                    "constraints_func": "verify_category($DATA)",
+                    "encode": "CATEGORIES_ENCODE"
                 }
             }
         }
     }
+
 }
