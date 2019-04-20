@@ -1,0 +1,31 @@
+{
+    "tag": "62",
+    "length": "var",
+    "content": {
+        "version": {
+            "tag": "02",
+            "length": "01",
+            "constraints": "\\d"
+        },
+        "last_update": {
+            "tag": "5F28",
+            "length": "07",
+            "constraints": "2[01]\\d{2}(0\\d|1[012])([012]\\d|3[01])([01]\\d|2[0-3])([0-5]\\d){2}"
+        },
+        "expiration_date": {
+            "tag": "5F2B",
+            "length": "07",
+            "constraints": "2[01]\\d{2}(0\\d|1[012])([012]\\d|3[01])([01]\\d|2[0-3])([0-5]\\d){2}"
+        },
+        "next_update": {
+            "tag": "5F38",
+            "length": "07",
+            "constraints": "2[01]\\d{2}(0\\d|1[012])([012]\\d|3[01])([01]\\d|2[0-3])([0-5]\\d){2}"
+        },
+        "management_info": {
+            "tag": "5f39",
+            "length": "var",
+            "constraints": "[0-7]+"
+        }
+    }
+}
