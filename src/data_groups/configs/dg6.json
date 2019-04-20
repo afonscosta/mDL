@@ -1,0 +1,21 @@
+{
+    "tag": "75",
+    "length": "var",
+    "content": {
+        "tag": "7F61",
+        "length": "var",
+        "content": {
+            "number_of_entries": {
+                "tag": "02",
+                "length": "var"
+            },
+            "biometrics": {
+                "size_list": "number_of_entries", //No nosso caso seria sempre 1
+                "tag": "7F60",
+                "length": "var", 
+                "constraints": "verify_biometrics($DATA)",//?
+                "encode": "BIOMETRICS_ENCODE"
+            }
+        }
+    }
+}
