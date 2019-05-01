@@ -1,0 +1,16 @@
+{
+    "tag": "60",
+    "length": "var",
+    "content": {
+        "version": {
+            "tag": "5F01",
+            "length": "var",
+            "constraints": "(\\d|[A-F])+"
+        },
+        "tag_list": {
+            "tag": "5C",
+            "length": "var",
+            "constraints": "(\\d|[A-F])+"
+        }
+    }
+}

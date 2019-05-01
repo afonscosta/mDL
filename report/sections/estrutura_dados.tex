@@ -1,10 +1,19 @@
-A estrutura de dados mDL é codificada como um conjunto de objetos de dados BER-TLV e pode ser apresentada em dois formatos: \textit{standard encoding} e \textit{compact encoding}.
+A estrutura de dados mDL é codificada como um conjunto de objetos de dados BER-TLV. 
 
-% TODO: Explicar BER-TLV
+As \textit{Basic Encoding Rules} (BER) especificam o formato da estrutura de dados, recorrendo a um método de \textit{enconding type-length-value} (TLV). A codificação de dados consiste em quatro elementos que se apresentam na seguinte ordem:
+
+\begin{enumerate}
+    \item O octeto \textit{Type}, que distingue os dados de outros membros.
+    \item O octeto \textit{Length}, que define o número de bytes que constituem o objeto.
+    \item O octeto \textit{Value}, que contém o conteúdo do elemento de dados.
+\end{enumerate}
+
+Deste modo, a estrutura mDL pode ser apresentada em dois formatos: \textit{standard encoding} e \textit{compact encoding}.
+
 
 \subsection{\textit{Standard encoding}}
 
-%O \textit{standard encoding} do mDL é constituído por três componentes primários: A estrutura de ficheiros, o conjunto de comandos e os grupos de dados que o constituem.
+O \textit{standard encoding} do mDL é constituído por três componentes primários: A estrutura de ficheiros, o conjunto de comandos e os grupos de dados que o constituem.
 
 \subsubsection{Estrutura de ficheiros}
 
@@ -37,13 +46,6 @@ EF.CardAccess & \begin{tabular}[c]{@{}l@{}}Condicional\\ (Obrigatória se PACE �
 EF.GroupAccess & Obrigatória &  \\ \hline
 \end{tabular}
 \end{table}
-
-
-%\begin{\begin{itemize}
-%    \item A estrutura
-%    \item
-%    \item 
-%\end{itemize}
 
 \subsubsection{Comandos}
 
@@ -159,6 +161,29 @@ Tag & Comprimento & Valor \\ \hline
 \end{table}
 
 
+\subsubsection{EF.COM}
+
+Este grupo de dados é responsável pelo armazenamento da versão da estrutura de dados lógica e a lista de \textit{tags} correspondentes aos grupos de dados presentes na implementação do mDL. O EF.COM é identificado pela \textit{tag} \texttt{'60'} e o identificador \texttt{'1E'}, seguido pelo comprimento total do grupo. Seguem-se então os seguintes parâmetros:
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|}
+\hline
+\rowcolor[HTML]{C0C0C0} 
+Tag & Comprimento & Valor \\ \hline
+'5F01' & Variável & \begin{tabular}[c]{@{}c@{}}Número da versão em formato 'aabb', no qual 'aa' define o maior nível \\ de revisão e 'bb' define o nível de lançamento. Ambos são numéricos\\ e codificados como 2 bytes em formato BCD.\end{tabular} \\ \hline
+'5C' & Variável & A lista de tags de grupos de dados. \\ \hline
+\end{tabular}%
+}\end{table}
+
+\subsubsection{EF.SOD}
+
+O elemento EF.SOD é um documento de segurança identificado pela \textit{tag} \texttt{'77'} e o identificador \texttt{'1D'}. Trata-se de uma assinatura digital gerada através da concatenação das assinaturas de todos os restantes elementos presentes, em formato DER. 
+
+\subsubsection{EF.GroupAccess}
+
+O grupo EF.GroupAccess contem a informação de quais dados estão disponíveis a um leitor mDL, sendo identificado pelo identificador \texttt{'18'}. Este contém apenas a \textit{tag} \texttt{'04'}, o comprimento dos dados e uma \textit{string} de octetos correspondentes aos grupos de dados a que o leitor tem acesso, bem como as respetivas \textit{tags}. Como este elemento é dinâmico, a sua \textit{hash} não está presente no ficheiro EF.SOD.
 
 \subsection{\textit{Compact encoding}}
 
