@@ -8,38 +8,38 @@
             "content": {
                 "family_name": {
                     "length": "var",
-                    "constraints": "[\\s\\w]{1,36}"
+                    "constraints": "[$A$S]{1,36}"
                 },
                 "name": {
                     "length": "var",
-                    "constraints": "[\\s\\w]{1,36}"
+                    "constraints": "[$A$S]{1,36}"
                 },
                 "date_of_birth": {
                     "length": 4,
-                    "constraints": "\\d{8}",
-                    "encode": "NO_ENCODE"
+                    "constraints": "[$N]{8}",
+                    "encode": "BCD"
                 },
                 "date_of_issue": {
                     "length": 4,
-                    "constraints": "\\d{8}",
-                    "encode": "NO_ENCODE"
+                    "constraints": "[$N]{8}",
+                    "encode": "BCD"
                 },
                 "date_of_expiry": {
                     "length": 4,
-                    "constraints": "\\d{8}",
-                    "encode": "NO_ENCODE"
+                    "constraints": "[$N]{8}",
+                    "encode": "BCD"
                 },
                 "issuing_country": {
                     "length": 3,
-                    "constraints": "\\w{3}"
+                    "constraints": "[$A]{3}"
                 },
                 "issuing_authority": {
                     "length": "var",
-                    "constraints": "[\\s\\w\\d]{1,65}"
+                    "constraints": "[$A$N$S]{1,65}"
                 },
                 "license_number": {
                     "length": "var",
-                    "constraints": "[\\w\\d]{1,25}"
+                    "constraints": "[$A$N]{1,25}"
                 }
             }
         },

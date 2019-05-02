@@ -2,6 +2,35 @@ import json
 import bcd
 import re
 
+hex_to_char = lambda hex_code: re.escape(chr(int(hex_code,16)))
+regex_between = lambda hex_code_1, hex_code_2: \
+                    hex_to_char(hex_code_1) + '-' + hex_to_char(hex_code_2)
+
+# Special characters
+S = ''.join([regex_between('20', '2F'),
+              hex_to_char('3A'),
+              regex_between('3C', '40'),
+              regex_between('5B', '60'),
+              regex_between('7B', '7E'),
+              regex_between('A1', 'AC'),
+              regex_between('A5', 'AE'),
+              regex_between('A7', 'BF')
+            ])
+
+# Numeric character
+N = regex_between('30', '39')
+
+# Alphabetic character
+A = ''.join([regex_between('41', '5A'),
+              regex_between('61', '7A'),
+              regex_between('C0', 'D6'),
+              regex_between('D8', 'F6'),
+              regex_between('F8', 'FF')
+            ])
+
+# Delimiters
+D = ';×÷'
+
 
 def bin_to_hex(bin_text):
     """ Converte um texto em formato binário para hexadecimal.
@@ -120,7 +149,6 @@ def extract_length(hex_text):
         raise Exception("ERROR: No length found.")
 
 
-# DÚVIDA: BCD??
 def data_to_hex(data, encode):
     """ Converte dados para um formato hexadecimal, com determinada
     codificação.
@@ -149,9 +177,9 @@ def data_to_hex(data, encode):
     # Codificação BCD
     if encode and encode.upper() == 'BCD':
         if isinstance(data, str) and data.isdigit():
-            content = bcd.int_to_bcd(int(data))
+            content = bin_to_hex(bcd.int_to_bcd(int(data)))
         elif isinstance(data, int):
-            content = bcd.int_to_bcd(data)
+            content = bin_to_hex(bcd.int_to_bcd(data))
         else:
             raise Exception('ERROR: Data format unknown.')
     
@@ -222,9 +250,9 @@ def hex_to_data(hex_data, encode, decode):
     # Codificação BCD
     if encode and encode.upper() == 'BCD':
         if decode and decode.upper() == 'INT':
-            content = bcd.bcd_to_int(hex_data)
+            content = bcd.bcd_to_int(hex_to_bin(hex_data))
         else:
-            content = str(bcd.bcd_to_int(hex_data))
+            content = str(bcd.bcd_to_int(hex_to_bin(hex_data)))
     
     # Sem codificação
     elif encode and encode.upper() == 'NO_ENCODE':
@@ -362,12 +390,12 @@ def verify_category(category):
     """
 
     # Componentes da categoria
-    code_category = r'[\w\d]{1,2}'   # DÚVIDA: código da categoria, e.g. D1E -> 2AN (tabela A.1, p. 22, ISO/IEC 18013-2)? E o ALL (não deveriam ser linhas diferentes)?
-    date_of_issue = r'\d{8}'
-    date_of_expiry = r'\d{8}'
-    code = r'[\w\d\s]{1,5}'
-    sign = r'[<=>]{1,2}'        # DÚVIDA: S é simbolo, aparentemente. Mudar todos os 'S' para simbolos? E os espaços?
-    value = r'\d+'              # DÚVIDA: Se não tem o tamanho, não deveria ser só 1 (tabela A.1, p. 22, ISO/IEC 18013-2)?
+    code_category = r'[' + A + N + r']{1,2}'
+    date_of_issue = r'[' + N + r']{8}'
+    date_of_expiry = r'[' + N + r']{8}'
+    code = r'[' + A + N + S + r']{1,5}'
+    sign = r'[' + S + r']{1,2}'
+    value = r'[' + N + r']+'
 
     # Padrão que caracteriza uma categoria
     pattern = r'^' + code_category + r';' + date_of_issue + r';' + date_of_expiry + r';' + code + r';' + sign + r';' + value + r'$'
@@ -400,7 +428,13 @@ def validate_constraints(data, config, last_key):
 
     # Valida restrição com expressões regulares
     if 'constraints' in config:
-        if not re.match(r'^' + config['constraints'] + r'$', str(data), flags=re.UNICODE):
+        if not re.match(r'^' + config['constraints'].replace('$A', A)
+                                                    .replace('$N', N)
+                                                    .replace('$S', S)
+                                                    .replace('$D', D)
+                        + r'$',
+                        str(data),
+                        flags=re.UNICODE):
             raise Exception(f'ERROR: Field {last_key} cannot take the value "{data}".')
     
     # Valida restrição com funções

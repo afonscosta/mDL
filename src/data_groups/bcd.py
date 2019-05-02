@@ -1,4 +1,8 @@
 #!/bin/python/
+
+# Font: https://github.com/dafyddcrosby/python-bcd/blob/master/bcd.py
+# Edited: Group 5
+
 # Copyright 2012 Dafydd Crosby <dafydd@dafyddcrosby.com>
 # All rights reserved.
 
@@ -28,18 +32,10 @@ Methods to translate to and from binary coded decimal
 """
 
 
-def bcd_to_int(x):
+def int_to_bcd(x):
     """
-    This translates binary coded decimal into an integer
-    TODO - more efficient algorithm
-
-    >>> bcd_to_int(4)
-    4
-
-    >>> bcd_to_int(159)
-    345
+    This translates an integer into binary coded decimal
     """
-    x = int(x)
 
     if x < 0:
         raise ValueError("Cannot be a negative integer")
@@ -56,23 +52,15 @@ def bcd_to_int(x):
         else:
             x = q
 
-    return int(binstring, 2)
+    return binstring
 
 
-def int_to_bcd(x):
+def bcd_to_int(binstring):
     """
-    This translates an integer into
-    binary coded decimal
-
-    >>> int_to_bcd(4)
-    '4'
-
-    >>> int_to_bcd(34)
-    '22'
-    
-    >>> int_to_bcd(0)
-    '0'
+    This translates binary coded decimal into an integer
     """
+
+    x = int(binstring, 2)
 
     if x < 0:
         raise ValueError("Cannot be a negative integer")
@@ -85,4 +73,4 @@ def int_to_bcd(x):
         nibble = x % 16
         bcdstring = str(nibble) + bcdstring
         x >>= 4
-    return bcdstring
+    return int(bcdstring)
