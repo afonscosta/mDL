@@ -9,3 +9,5 @@ report/main.toc
 report/main.bbl
 report/main.blg
 report/clean.sh
+src/__pycache__
+src/data_groups/__pycache__

@@ -1,4 +1,6 @@
 import asn1_parser as asn1
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
 
 class DG1:
     """
@@ -67,8 +69,9 @@ class DG1:
         self.license_number = data['license_number']
         self.number_of_entries = data['number_of_entries']
         self.categories_of_vehicles = data['categories_of_vehicles']
+        self.permissions = []
 
-
+    # TODO: É para cifrar?
     def save(self, filename):
         """Armazena os dados do DG1 num ficheiro, codificados com ASN1.
         
@@ -78,7 +81,7 @@ class DG1:
             nome do ficheiro onde se pretende armazenar os dados
         """
         with open(filename, 'w+') as fp:
-            hex_data = asn1.encode(self, './configs/dg1.json')
+            hex_data = asn1.encode(self, './data_groups/configs/dg1.json')
             fp.write(hex_data)
 
 
@@ -97,7 +100,7 @@ class DG1:
             e respetivo conteúdo como valor
         """
         with open(filename, 'r') as fp:
-            data = asn1.decode(fp.read(), './configs/dg1.json')
+            data = asn1.decode(fp.read(), './data_groups/configs/dg1.json')
         return data
 
 
@@ -120,10 +123,54 @@ class DG1:
              str(self.number_of_entries),\
              str(self.categories_of_vehicles)])
 
+    def set_permissions(self, allowed):
+        """ Estabelece os campos que têm autorização para serem lidos.
 
-DATA = {'family_name': 'Smithe Williams', 'name': 'Alexander George Thomas', 'date_of_birth': '19700301', 'date_of_issue': '20020915', 'date_of_expiry': '20070930', 'issuing_country': 'JPN', 'issuing_authority': 'HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC', 'license_number': 'A290654395164273X', 'number_of_entries': 1, 'categories_of_vehicles': ['C1;20000315;20100314;S01;<=;38303030']}
-dg1 = DG1(DATA)
-dg1.save('dg1.txt')
+        Parâmetros
+        ----------
+        allowed : list
+            lista com as strings dos campos cujo acesso é permitido.
+        """
+        self.permissions = allowed
 
-dg2 = DG1('dg1.txt')
-print(dg2)
+    def get_data(self):
+        """ Devolve os dados permitidos.
+
+        Retorna
+        -------
+        data : dict
+            dicionário com os nomes das variáveis de instância como chaves
+            e respetivo conteúdo como valor
+        """
+        data = {}
+        for perm in self.permissions:
+            data[perm] = getattr(self, perm)
+        return data
+
+    def hash(self):
+        """ Calcula o valor de hash dos dados do DG1.
+
+        Retorna
+        -------
+        digest : str
+            valor de hash
+        """
+        data = self.family_name + self.name +\
+            self.date_of_birth + self.date_of_issue +\
+            self.date_of_expiry + self.issuing_country +\
+            self.issuing_authority + self.license_number +\
+            "".join(self.categories_of_vehicles) #TODO: está bem assim? divisores?
+            # self.number_of_entries + self.categories_of_vehicles (TODO: number_of_entries é preciso?)
+        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+        digest.update(data.encode())
+        return digest.finalize()
+
+
+
+
+#DATA = {'family_name': 'Smithe Williams', 'name': 'Alexander George Thomas', 'date_of_birth': '19700301', 'date_of_issue': '20020915', 'date_of_expiry': '20070930', 'issuing_country': 'JPN', 'issuing_authority': 'HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC', 'license_number': 'A290654395164273X', 'number_of_entries': 1, 'categories_of_vehicles': ['C1;20000315;20100314;S01;<=;38303030']}
+#dg1 = DG1(DATA)
+#dg1.save('dg1.txt')
+
+#dg2 = DG1('dg1.txt')
+#print(dg2)
