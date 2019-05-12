@@ -69,9 +69,18 @@ class DG1:
         self.license_number = data['license_number']
         self.number_of_entries = data['number_of_entries']
         self.categories_of_vehicles = data['categories_of_vehicles']
-        self.permissions = []
+        self.tags = {'61': 'ALL',
+                     '5F20': 'family_name',
+                     '5F21': 'name',
+                     '5F22': 'date_of_birth',
+                     '5F29': 'date_of_issue',
+                     '5F2A': 'date_of_expiry',
+                     '5F2C': 'issuing_country',
+                     '5F2D': 'issuing_authority',
+                     '5F2F': 'license_number',
+                     '7F63': 'categories_of_vehicles'}
 
-    # TODO: É para cifrar?
+
     def save(self, filename):
         """Armazena os dados do DG1 num ficheiro, codificados com ASN1.
         
@@ -122,29 +131,37 @@ class DG1:
              self.license_number,\
              str(self.number_of_entries),\
              str(self.categories_of_vehicles)])
+    
 
-    def set_permissions(self, allowed):
-        """ Estabelece os campos que têm autorização para serem lidos.
+    def get_data(self, permissions):
+        """ Devolve os dados permitidos.
 
         Parâmetros
         ----------
-        allowed : list
-            lista com as strings dos campos cujo acesso é permitido.
-        """
-        self.permissions = allowed
-
-    def get_data(self):
-        """ Devolve os dados permitidos.
+        permissions : list
+            lista com as tags dos elementos de dados permitidos
 
         Retorna
         -------
         data : dict
-            dicionário com os nomes das variáveis de instância como chaves
-            e respetivo conteúdo como valor
+            dicionário com os nomes das variáveis de instância permitidas
+            como chaves e respetivo conteúdo como valor
         """
         data = {}
-        for perm in self.permissions:
-            data[perm] = getattr(self, perm)
+        for tag in permissions:
+            allowed_attr = self.tags[tag]
+            if allowed_attr == 'ALL':
+                data['family_name'] = self.family_name
+                data['name'] = self.name
+                data['date_of_birth'] = self.date_of_birth
+                data['date_of_issue'] = self.date_of_issue
+                data['date_of_expiry'] = self.date_of_expiry
+                data['issuing_country'] = self.issuing_country
+                data['issuing_authority'] = self.issuing_authority
+                data['license_number'] = self.license_number
+                data['categories_of_vehicles'] = self.categories_of_vehicles
+            else:
+                data[allowed_attr] = getattr(self, allowed_attr)
         return data
 
     def hash(self):

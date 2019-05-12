@@ -22,7 +22,7 @@ class mDL:
             #self.dg10 = dg10.DG10(data['dg10'])
             #self.bcd = bcd.BCD(data['bcd'])
             #self.ef_com = ef_com.EF_COM(data['ef_com'])
-            #self.ef_groupAccess = ef_groupAccess.EF_GroupAccess(data['ef_groupAccess'])
+            self.ef_groupAccess = ef_groupAccess.EF_GroupAccess(data['ef_groupAccess'])
             #self.ef_sod = ef_sod.EF_SOD(data['ef_sod'])
 
     def load(self):
@@ -35,21 +35,21 @@ class mDL:
             e respetivo conteúdo como valor
         """
         self.dg1 = dg1.DG1('./data_groups/asn1_hex_data/dg1.txt')
-        #self.dg6 = dg6.DG6('./data_groups/configs/dg6.json')
-        #self.dg10 = dg10.DG10('./data_groups/configs/dg10.json')
-        #self.bcd = bcd.BCD('./data_groups/configs/bcd.json')
-        #self.ef_com = ef_com.EF_COM('./data_groups/configs/ef_com.json')
-        #self.ef_groupAccess = ef_groupAccess.EF_GroupAccess('./data_groups/configs/ef_groupAccess.json')
-        #self.ef_sod = ef_sod.EF_SOD('./data_groups/configs/ef_sod.json')
+        #self.dg6 = dg6.DG6('./data_groups/asn1_hex_data/dg6.txt')
+        #self.dg10 = dg10.DG10('./data_groups/asn1_hex_data/dg10.txt')
+        #self.bcd = bcd.BCD('./data_groups/asn1_hex_data/bcd.txt')
+        #self.ef_com = ef_com.EF_COM('./data_groups/asn1_hex_data/ef_com.txt')
+        self.ef_groupAccess = ef_groupAccess.EF_GroupAccess('./data_groups/asn1_hex_data/ef_groupAccess.txt')
+        #self.ef_sod = ef_sod.EF_SOD('./data_groups/asn1_hex_data/ef_sod.txt')
 
     def save(self):
         self.dg1.save('./data_groups/asn1_hex_data/dg1.txt')
-        #self.dg6.save('dg6.txt')
-        #self.dg10.save('dg10.txt')
-        #self.bcd.save('bcd.txt')
-        #self.ef_com.save('ef_com.txt')
-        #self.ef_groupAccess.save('ef_groupAccess.txt')
-        #self.ef_sod.save('ef_sod.txt')
+        #self.dg6.save('./data_groups/asn1_hex_data/dg6.txt')
+        #self.dg10.save('./data_groups/asn1_hex_data/dg10.txt')
+        #self.bcd.save('./data_groups/asn1_hex_data/bcd.txt')
+        #self.ef_com.save('./data_groups/asn1_hex_data/ef_com.txt')
+        self.ef_groupAccess.save('./data_groups/asn1_hex_data/ef_groupAccess.txt')
+        #self.ef_sod.save('./data_groups/asn1_hex_data/ef_sod.txt')
         #return data
 
 
@@ -70,8 +70,13 @@ class mDL:
         # Fazer update das autorizações
         pass
 
-data = { 'dg1': {'family_name': 'Smithe Williams', 'name': 'Alexander George Thomas', 'date_of_birth': '19700301', 'date_of_issue': '20020915', 'date_of_expiry': '20070930', 'issuing_country': 'JPN', 'issuing_authority': 'HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC', 'license_number': 'A290654395164273X', 'number_of_entries': 1, 'categories_of_vehicles': ['C1;20000315;20100314;S01;<=;38303030']} }
+data = { 'dg1': {'family_name': 'Smithe Williams', 'name': 'Alexander George Thomas', 'date_of_birth': '19700301', 'date_of_issue': '20020915', 'date_of_expiry': '20070930', 'issuing_country': 'JPN', 'issuing_authority': 'HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC', 'license_number': 'A290654395164273X', 'number_of_entries': 1, 'categories_of_vehicles': ['C1;20000315;20100314;S01;<=;38303030']}, 'ef_groupAccess': {1: ['5F20', '7F63'], 10: ['62']} }
 mdl = mDL(data)
-mdl.dg1.set_permissions(['family_name', 'categories_of_vehicles'])
-print(mdl.dg1.hash())
-print(mdl.dg1.get_data())
+mdl.save()
+#mdl.dg1.set_permissions(['family_name', 'categories_of_vehicles'])
+#print(mdl.dg1.hash())
+
+mdl_loaded = mDL()
+print('- All DG1:', mdl_loaded.dg1, sep="\n")
+print('\n- All GroupAccess:', mdl_loaded.ef_groupAccess, sep="\n")
+print('\n- Allowed DG1:', mdl_loaded.dg1.get_data(mdl_loaded.ef_groupAccess.get_permissions(1)), sep="\n")
