@@ -5,12 +5,12 @@
         "version": {
             "tag": "5F01",
             "length": "var",
-            "constraints": "(\\d|[A-F])+"
+            "encode": "VERSION_ENCODE"
         },
         "tag_list": {
             "tag": "5C",
             "length": "var",
-            "constraints": "(\\d|[A-F])+"
+            "encode": "DG_TAGS_LIST_ENCODE"
         }
     }
 }

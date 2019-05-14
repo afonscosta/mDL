@@ -265,6 +265,27 @@ def data_to_hex(data, encode):
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
+    # Codificação das lista de tags dos data groups
+    elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
+        try:
+            content = ''
+            all_tags = [v['tag'] for k, v in DG_TAGS.items()]
+            for tag in data:
+                if tag.upper() not in all_tags:
+                    raise Exception('ERROR: Wrong tag detected.')
+                content += tag
+        except:
+            raise Exception('ERROR: Wrong data group or tags format.')
+
+    # Codificação da versão
+    elif encode and encode.upper() == 'VERSION_ENCODE':
+        try:
+            content = ''
+            content += int_to_hex(int(data[:2]))
+            content += int_to_hex(int(data[2:]))
+        except:
+            raise Exception('ERROR: Wrong data group or tags format.')
+
     # Codificação por defeito
     else:
         if isinstance(data, str):
@@ -360,6 +381,31 @@ def hex_to_data(hex_data, encode, decode):
                         raise Exception('ERROR: Wrong tag detected.')
                 else:
                     raise Exception('ERROR: Wrong data group detected.')
+        except:
+            raise Exception('ERROR: Wrong data group or tags format.')
+
+    # Codificação dos data groups e respetivas tags
+    elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
+        content = []
+        all_tags = [v['tag'] for k, v in DG_TAGS.items()]
+        try:
+            hex_data = hex_data.upper()
+            i = 0
+            for j in range(2, len(hex_data)+1, 2):
+                tag = hex_data[i:j]
+                if not tag in all_tags:
+                    raise Exception('ERROR: Wrong tag detected.')
+                content.append(tag)
+                i = j
+        except:
+            raise Exception('ERROR: Wrong data group or tags format.')
+
+    # Codificação da versão
+    elif encode and encode.upper() == 'VERSION_ENCODE':
+        try:
+            content = ''
+            content += f"{hex_to_int(hex_data[:2]):02d}"
+            content += f"{hex_to_int(hex_data[2:]):02d}"
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
