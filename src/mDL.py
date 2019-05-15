@@ -18,9 +18,8 @@ class mDL:
             self.load()
         else:
             self.dg1 = dg1.DG1(data['dg1'])
-            #self.dg6 = dg6.DG6(data['dg6'])
+            self.dg6 = dg6.DG6(data['dg6'])
             #self.dg10 = dg10.DG10(data['dg10'])
-            #self.bcd = bcd.BCD(data['bcd'])
             self.ef_com = ef_com.EF_COM(data['ef_com'])
             self.ef_groupAccess = ef_groupAccess.EF_GroupAccess(data['ef_groupAccess'])
             #self.ef_sod = ef_sod.EF_SOD(data['ef_sod'])
@@ -35,23 +34,28 @@ class mDL:
             e respetivo conteúdo como valor
         """
         self.dg1 = dg1.DG1('./data_groups/asn1_hex_data/dg1.txt')
-        #self.dg6 = dg6.DG6('./data_groups/asn1_hex_data/dg6.txt')
+        self.dg6 = dg6.DG6('./data_groups/asn1_hex_data/dg6.txt')
         #self.dg10 = dg10.DG10('./data_groups/asn1_hex_data/dg10.txt')
-        #self.bcd = bcd.BCD('./data_groups/asn1_hex_data/bcd.txt')
         self.ef_com = ef_com.EF_COM('./data_groups/asn1_hex_data/ef_com.txt')
         self.ef_groupAccess = ef_groupAccess.EF_GroupAccess('./data_groups/asn1_hex_data/ef_groupAccess.txt')
         #self.ef_sod = ef_sod.EF_SOD('./data_groups/asn1_hex_data/ef_sod.txt')
 
     def save(self):
         self.dg1.save('./data_groups/asn1_hex_data/dg1.txt')
-        #self.dg6.save('./data_groups/asn1_hex_data/dg6.txt')
+        self.dg6.save('./data_groups/asn1_hex_data/dg6.txt')
         #self.dg10.save('./data_groups/asn1_hex_data/dg10.txt')
-        #self.bcd.save('./data_groups/asn1_hex_data/bcd.txt')
         self.ef_com.save('./data_groups/asn1_hex_data/ef_com.txt')
         self.ef_groupAccess.save('./data_groups/asn1_hex_data/ef_groupAccess.txt')
         #self.ef_sod.save('./data_groups/asn1_hex_data/ef_sod.txt')
         #return data
 
+    def set_permissions(self, allow):
+        self.ef_groupAccess.set_permissions(allow)
+    
+    def get_data(self):
+        return self.dg1.get_data(self.ef_groupAccess.get_permissions(1))\
+            + self.dg6.get_data(self.ef_groupAccess.get_permissions(6))
+            #+ self.dg10.get_data(self.ef_groupAccess.get_permissions(10))
 
     def auth_source(self):
         pass
@@ -70,6 +74,10 @@ class mDL:
         # Fazer update das autorizações
         pass
 
+
+with open("face-image.jpg", "rb") as fd:
+    image_bytes = fd.read()
+
 DATA = {
     'dg1': {
         'family_name': 'Smithe Williams',
@@ -81,7 +89,18 @@ DATA = {
         'issuing_authority': 'HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC',
         'license_number': 'A290654395164273X',
         'number_of_entries': 1,
-        'categories_of_vehicles': ['C1;20000315;20100314;S01;<=;38303030']
+        'categories_of_vehicles': ['C1;20000315;20100314;S01;<=;38303030','C1;20000315;20100314;S01;<=;38303030']
+    },
+    'dg6': {
+        'biometric_templates': [
+            {
+                'version': 257,
+                'bdb_owner': 257,
+                'bdb_type': 8,
+                'bdb': image_bytes[:16000]
+            }
+        ],
+        'number_of_entries': 1
     },
     'ef_groupAccess': {
         1: ['5F20', '7F63'],
@@ -100,6 +119,14 @@ mdl.save()
 
 mdl_loaded = mDL()
 print('- All DG1:', mdl_loaded.dg1, sep="\n")
+print('\n- All DG6:', mdl_loaded.dg6, sep="\n")
 print('\n- All COM:', mdl_loaded.ef_com, sep="\n")
 print('\n- All GroupAccess:', mdl_loaded.ef_groupAccess, sep="\n")
 print('\n- Allowed DG1:', mdl_loaded.dg1.get_data(mdl_loaded.ef_groupAccess.get_permissions(1)), sep="\n")
+
+# TODO: Dúvidas DG6
+# - Imagens muito grandes dão exceção 'Data too long', por causa da função length, que admite um tamanho máximo de 65535 bytes (Especificação para o ASN1)-
+# - Não está implementada a codificação da imagem de acordo com o ISO 19794-5 (https://www.sis.se/api/document/preview/913943/). Necessário?
+# - Necessário implementar o armazenamento da imagem cifrada (tag='7F2E')?
+# - Implementei o get_data sem usar as permissões - pk talvez seja para considerar os grupos completos.
+# - Deve-se validar o type e owner format (Se existem)? E deve-se implementar para vários formatos?

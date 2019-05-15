@@ -189,7 +189,12 @@ def extract_length(hex_text):
         raise Exception("ERROR: No length found.")
 
 
-def data_to_hex(data, encode):
+def fill_length(hex_data, fixed_length_bytes):
+    fixed_length = 2*fixed_length_bytes
+    return '0'*(fixed_length-len(hex_data)) + hex_data
+
+
+def data_to_hex(data, encode, length = None):
     """ Converte dados para um formato hexadecimal, com determinada
     codificação.
 
@@ -277,6 +282,13 @@ def data_to_hex(data, encode):
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
+    # Codificação dos Biometric Data Block
+    elif encode and encode.upper() == 'BDB_ENCODE':
+        try:
+            content = data.hex()
+        except:
+            raise Exception('ERROR: Wrong BDB format.')
+    
     # Codificação da versão
     elif encode and encode.upper() == 'VERSION_ENCODE':
         try:
@@ -291,9 +303,12 @@ def data_to_hex(data, encode):
         if isinstance(data, str):
             content = data.encode().hex()
         elif isinstance(data, int):
-            content = format(data, '02x')
+            content = int_to_hex(data)
         else:
             raise Exception('ERROR: Data format unknown.')
+
+    if length is not None and isinstance(length, int):
+        content = fill_length(content, length)
 
     return content
 
@@ -400,6 +415,13 @@ def hex_to_data(hex_data, encode, decode):
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
+    # Codificação dos Biometric Data Block
+    elif encode and encode.upper() == 'BDB_ENCODE':
+        try:
+            content = bytes.fromhex(hex_data)
+        except:
+            raise Exception('ERROR: Wrong BDB format.')
+    
     # Codificação da versão
     elif encode and encode.upper() == 'VERSION_ENCODE':
         try:
@@ -407,12 +429,12 @@ def hex_to_data(hex_data, encode, decode):
             content += f"{hex_to_int(hex_data[:2]):02d}"
             content += f"{hex_to_int(hex_data[2:]):02d}"
         except:
-            raise Exception('ERROR: Wrong data group or tags format.')
+            raise Exception('ERROR: Wrong version format.')
 
     # Codificação por defeito
     else:
         if decode and decode.upper() == 'INT':
-            content = int(hex_data, 16)
+            content = hex_to_int(hex_data)
         else:
             content = bytes.fromhex(hex_data).decode()
 
@@ -613,15 +635,21 @@ def asn1_encode(data_group, config, last_key = None):
     
     # Se é lista, valida restrições e codifica cada elemento da variável
     if 'size_list' in config:
-        for elem in data:
-            validate_constraints(elem, config, last_key)
-            hex_result += hex_to_tlv(data_to_hex(elem, config.get('encode', None)), config)
+        if 'compost_content' in config:
+            for elem in data:
+                content = asn1_encode(elem, {'content': config['compost_content']}, last_key)
+                hex_result += hex_to_tlv(content, config)
+        else:
+            for elem in data:
+                validate_constraints(elem, config, last_key)
+                content = data_to_hex(elem, config.get('encode', None), config.get('length', None))
+                hex_result += hex_to_tlv(content, config)
     # Se não, caso tenha variável, calida-a e codifica-a; o resultado codificado
     # é armazenado como TLV
     else:
         if data:
             validate_constraints(data, config, last_key)
-            content = data_to_hex(data, config.get('encode', None))
+            content = data_to_hex(data, config.get('encode', None), config.get('length', None))
         hex_result = hex_to_tlv(content, config)
 
     return hex_result
@@ -665,6 +693,12 @@ def asn1_decode(hex_string, config, last_key = None):
     # Se tem tag ou comprimento, extrai o conteúdo associado
     if 'tag' in config or 'length' in config:
         hex_content, rest = tlv_to_data(hex_string, config)
+        # Se é lista, extrai todos os elementos separados
+        if 'size_list' in config:
+            hex_content = [hex_content]
+            while rest and rest.startswith(config['tag']):
+                list_elem, rest = tlv_to_data(rest, config)
+                hex_content.append(list_elem)
     else:
         hex_content = hex_string
 
@@ -678,15 +712,24 @@ def asn1_decode(hex_string, config, last_key = None):
             raise Exception('ERROR: Data length is higher than expected.')
     # Se não, descodifica a variável, valida-a e adiciona-a aos dados
     else:
-        data_tmp = hex_to_data(hex_content, config.get('encode', None), config.get('decode', None))
-        validate_constraints(data_tmp, config, last_key)
-
         if 'size_list' in config:
-            if last_key in data:
-                data[last_key].append(data_tmp)
-            else:
-                data[last_key] = [data_tmp]
+            for hex_elem in hex_content:
+                if 'compost_content' in config:
+                    data_tmp, rest_temp = asn1_decode(hex_elem, {'content': config['compost_content']}, last_key)
+                    # Se sobrar conteúdo, codificação está incorreta
+                    if rest_temp:
+                        raise Exception('ERROR: Data length is higher than expected.')
+                else:
+                    data_tmp = hex_to_data(hex_elem, config.get('encode', None), config.get('decode', None))
+                    validate_constraints(data_tmp, config, last_key)
+                
+                if last_key in data:
+                    data[last_key].append(data_tmp)
+                else:
+                    data[last_key] = [data_tmp]
         else:
+            data_tmp = hex_to_data(hex_content, config.get('encode', None), config.get('decode', None))
+            validate_constraints(data_tmp, config, last_key)
             data[last_key] = data_tmp
 
     return data, rest
