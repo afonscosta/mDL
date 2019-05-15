@@ -696,7 +696,7 @@ def asn1_decode(hex_string, config, last_key = None):
         # Se é lista, extrai todos os elementos separados
         if 'size_list' in config:
             hex_content = [hex_content]
-            while rest and rest.startswith(config['tag']):
+            while rest and rest.lower().startswith(config['tag'].lower()):
                 list_elem, rest = tlv_to_data(rest, config)
                 hex_content.append(list_elem)
     else:

@@ -97,7 +97,13 @@ DATA = {
                 'version': 257,
                 'bdb_owner': 257,
                 'bdb_type': 8,
-                'bdb': image_bytes[:16000]
+                'bdb': image_bytes[:64000]
+            },
+            {
+                'version': 257,
+                'bdb_owner': 257,
+                'bdb_type': 8,
+                'bdb': image_bytes[64000:65000]
             }
         ],
         'number_of_entries': 1
