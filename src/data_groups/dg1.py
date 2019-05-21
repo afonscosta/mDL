@@ -69,17 +69,6 @@ class DG1:
         self.license_number = data['license_number']
         self.number_of_entries = data['number_of_entries']
         self.categories_of_vehicles = data['categories_of_vehicles']
-        self.tags = {'61': 'ALL',
-                     '5F20': 'family_name',
-                     '5F21': 'name',
-                     '5F22': 'date_of_birth',
-                     '5F29': 'date_of_issue',
-                     '5F2A': 'date_of_expiry',
-                     '5F2C': 'issuing_country',
-                     '5F2D': 'issuing_authority',
-                     '5F2F': 'license_number',
-                     '7F63': 'categories_of_vehicles'}
-
 
     def save(self, filename):
         """Armazena os dados do DG1 num ficheiro, codificados com ASN1.
@@ -93,6 +82,15 @@ class DG1:
             hex_data = asn1.encode(self, './data_groups/configs/dg1.json')
             fp.write(hex_data)
 
+    def encode(self):
+        """Codificados os dados do DG1 com ASN1.
+        
+        Retorna:
+        --------
+        hex_data : str
+            dados do DG1 codificados em hexadecimal
+        """
+        return asn1.encode(self, './data_groups/configs/dg1.json')
 
     def load(self, filename):
         """ Carrega os dados do DG1 de um ficheiro, codificado com ASN1.
@@ -133,35 +131,25 @@ class DG1:
              str(self.categories_of_vehicles)])
     
 
-    def get_data(self, permissions):
-        """ Devolve os dados permitidos.
-
-        Parâmetros
-        ----------
-        permissions : list
-            lista com as tags dos elementos de dados permitidos
+    def get_data(self):
+        """ Devolve os dados associados.
 
         Retorna
         -------
         data : dict
-            dicionário com os nomes das variáveis de instância permitidas
-            como chaves e respetivo conteúdo como valor
+            dicionário com os nomes das variáveis de instância como
+            chaves e respetivo conteúdo como valor
         """
         data = {}
-        for tag in permissions:
-            allowed_attr = self.tags[tag]
-            if allowed_attr == 'ALL':
-                data['family_name'] = self.family_name
-                data['name'] = self.name
-                data['date_of_birth'] = self.date_of_birth
-                data['date_of_issue'] = self.date_of_issue
-                data['date_of_expiry'] = self.date_of_expiry
-                data['issuing_country'] = self.issuing_country
-                data['issuing_authority'] = self.issuing_authority
-                data['license_number'] = self.license_number
-                data['categories_of_vehicles'] = self.categories_of_vehicles
-            else:
-                data[allowed_attr] = getattr(self, allowed_attr)
+        data['family_name'] = self.family_name
+        data['name'] = self.name
+        data['date_of_birth'] = self.date_of_birth
+        data['date_of_issue'] = self.date_of_issue
+        data['date_of_expiry'] = self.date_of_expiry
+        data['issuing_country'] = self.issuing_country
+        data['issuing_authority'] = self.issuing_authority
+        data['license_number'] = self.license_number
+        data['categories_of_vehicles'] = self.categories_of_vehicles
         return data
 
     def hash(self):

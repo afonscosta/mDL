@@ -53,9 +53,24 @@ class mDL:
         self.ef_groupAccess.set_permissions(allow)
     
     def get_data(self):
-        return self.dg1.get_data(self.ef_groupAccess.get_permissions(1))\
-            + self.dg6.get_data(self.ef_groupAccess.get_permissions(6))
-            #+ self.dg10.get_data(self.ef_groupAccess.get_permissions(10))
+        result = {}
+        if self.ef_groupAccess.is_allowed(1):
+            result[1] = self.dg1.get_data()
+        if self.ef_groupAccess.is_allowed(6):
+            result[6] = self.dg6.get_data()
+        #if self.ef_groupAccess.is_allowed(10):
+        #    result[10] = self.dg10.get_data()
+        return str(result)
+    
+    def get_data_hex(self):
+        result = ''
+        if self.ef_groupAccess.is_allowed(1):
+            result += self.dg1.encode()
+        if self.ef_groupAccess.is_allowed(6):
+            result += self.dg6.encode()
+        #if self.ef_groupAccess.is_allowed(10):
+        #    result += self.dg10.get_data()
+        return result
 
     def auth_source(self):
         pass
@@ -109,8 +124,8 @@ DATA = {
         'number_of_entries': 1
     },
     'ef_groupAccess': {
-        1: ['5F20', '7F63'],
-        10: ['62']
+        1: '61',
+        10: '62'
     },
     'ef_com': {
         'version': '0100',
@@ -128,11 +143,11 @@ print('- All DG1:', mdl_loaded.dg1, sep="\n")
 print('\n- All DG6:', mdl_loaded.dg6, sep="\n")
 print('\n- All COM:', mdl_loaded.ef_com, sep="\n")
 print('\n- All GroupAccess:', mdl_loaded.ef_groupAccess, sep="\n")
-print('\n- Allowed DG1:', mdl_loaded.dg1.get_data(mdl_loaded.ef_groupAccess.get_permissions(1)), sep="\n")
+print('\n- Allowed:', mdl_loaded.get_data(), sep="\n")
+print('\n- Allowed HEX:', mdl_loaded.get_data_hex(), sep="\n")
 
 # TODO: Dúvidas DG6
-# - Imagens muito grandes dão exceção 'Data too long', por causa da função length, que admite um tamanho máximo de 65535 bytes (Especificação para o ASN1)-
+# - Imagens muito grandes dão exceção 'Data too long', por causa da função length, que admite um tamanho máximo de 65535 bytes (Especificação para o ASN1).
 # - Não está implementada a codificação da imagem de acordo com o ISO 19794-5 (https://www.sis.se/api/document/preview/913943/). Necessário?
 # - Necessário implementar o armazenamento da imagem cifrada (tag='7F2E')?
-# - Implementei o get_data sem usar as permissões - pk talvez seja para considerar os grupos completos.
 # - Deve-se validar o type e owner format (Se existem)? E deve-se implementar para vários formatos?

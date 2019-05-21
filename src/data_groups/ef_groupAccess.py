@@ -8,8 +8,8 @@ class EF_GroupAccess:
             self.allowed_data_groups = self.load(data)['allowed_data_groups']
         else:
             self.allowed_data_groups = {}
-            for dg, tags in data.items():
-                self.allowed_data_groups[dg] = tags
+            for dg, tag in data.items():
+                self.allowed_data_groups[dg] = tag
 
     def save(self, filename):
         """Armazena os dados do GroupAccess num ficheiro, codificados com ASN1.
@@ -51,8 +51,8 @@ class EF_GroupAccess:
         data : str
             string com os dados do GroupAccess
         """
-        return ' | '.join([ 'DG' + str(dg) + ' (' + ', '.join(tags) + ')'
-                            for dg, tags in self.allowed_data_groups.items()])
+        return ' | '.join([ 'DG' + str(dg) + ' (' + tag + ')'
+                            for dg, tag in self.allowed_data_groups.items()])
 
     def set_permissions(self, allowed):
         """ Estabelece os campos que têm autorização para serem lidos.
@@ -64,11 +64,11 @@ class EF_GroupAccess:
             tags cujo acesso ao conteúdo é permitido como valor
         """
         self.allowed_data_groups = {}
-        for dg, tags in allowed.items():
-            self.allowed_data_groups[dg] = tags
+        for dg, tag in allowed.items():
+            self.allowed_data_groups[dg] = tag
     
-    def get_permissions(self, dg):
-        """ Obtém as tags cujo acesso é permitido, de um determinado data group.
+    def is_allowed(self, dg):
+        """ Obtém indicação se acesso a determinado data group é permitido.
 
         Parâmetros
         ----------
@@ -77,8 +77,8 @@ class EF_GroupAccess:
 
         Retorna
         -------
-        tags : list
-            lista das tags do grupo de dados 'dg', cujo acesso ao conteúdo é
-            permitido
+        result : boolean
+            True, se existe permissão para aceder ao data group. False,
+            caso contrário.
         """
-        return self.allowed_data_groups[dg]
+        return dg in self.allowed_data_groups

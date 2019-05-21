@@ -28,9 +28,9 @@ A = ''.join([regex_between('41', '5A'),
               regex_between('F8', 'FF')
             ])
 
-DG_TAGS = { '01': {'tag': '61', 'data_elements': ['5F20','5F21','5F22','5F29','5F2A','5F2C','5F2D','5F2F','7F63']},
-            '06': {'tag': '75', 'data_elements': []},
-            '0A': {'tag': '62', 'data_elements': ['5F28','5F2B','5F38']}
+DG_TAGS = { '01': '61',
+            '06': '75',
+            '0A': '62'
           }
 
 # Delimiters
@@ -256,17 +256,15 @@ def data_to_hex(data, encode, length = None):
     elif encode and encode.upper() == 'DG_TAGS_ENCODE':
         try:
             content = ''
-            for dg, tags in data.items():
+            for dg, tag in data.items():
                 dg_hex = int_to_hex(dg).upper()
 
                 if dg_hex not in DG_TAGS:
                     raise Exception('ERROR: Wrong data group detected.')
-                all_tags = [DG_TAGS[dg_hex]['tag']] + DG_TAGS[dg_hex]['data_elements']
-                for tag in tags:
-                    tag = tag.upper()
-                    if tag not in all_tags:
-                        raise Exception('ERROR: Wrong tag detected.')
-                    content += dg_hex + tag
+                tag = tag.upper()
+                if tag != DG_TAGS[dg_hex]:
+                    raise Exception('ERROR: Wrong tag detected.')
+                content += dg_hex + tag
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
@@ -274,7 +272,7 @@ def data_to_hex(data, encode, length = None):
     elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
         try:
             content = ''
-            all_tags = [v['tag'] for k, v in DG_TAGS.items()]
+            all_tags = list(DG_TAGS.values())
             for tag in data:
                 if tag.upper() not in all_tags:
                     raise Exception('ERROR: Wrong tag detected.')
@@ -381,17 +379,9 @@ def hex_to_data(hex_data, encode, decode):
                 if dg_hex in DG_TAGS:
                     hex_data = hex_data[2:]
                     # Extrai tag do data group
-                    if hex_data[:2] == DG_TAGS[dg_hex]['tag']:
-                        if dg not in content:
-                            content[dg] = []
-                        content[dg].append(hex_data[:2])
+                    if hex_data[:2] == DG_TAGS[dg_hex]:
+                        content[dg] = DG_TAGS[dg_hex]
                         hex_data = hex_data[2:]
-                    # Extrai tag de elemento do data group
-                    elif hex_data[:4] in DG_TAGS[dg_hex]['data_elements']:
-                        if dg not in content:
-                            content[dg] = []
-                        content[dg].append(hex_data[:4])
-                        hex_data = hex_data[4:]
                     else:
                         raise Exception('ERROR: Wrong tag detected.')
                 else:
@@ -402,7 +392,7 @@ def hex_to_data(hex_data, encode, decode):
     # Codificação dos data groups e respetivas tags
     elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
         content = []
-        all_tags = [v['tag'] for k, v in DG_TAGS.items()]
+        all_tags = list(DG_TAGS.values())
         try:
             hex_data = hex_data.upper()
             i = 0

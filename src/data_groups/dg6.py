@@ -90,19 +90,14 @@ class DG6:
         return ';'.join([str(t) for t in self.biometric_templates])
     
 
-    def get_data(self, permissions):
-        """ Devolve os dados permitidos.
-
-        Parâmetros
-        ----------
-        permissions : list
-            lista com as tags dos elementos de dados permitidos
+    def get_data(self):
+        """ Devolve os dados associados.
 
         Retorna
         -------
         data : dict
-            dicionário com os nomes das variáveis de instância permitidas
-            como chaves e respetivo conteúdo como valor
+            dicionário com os nomes das variáveis de instância como
+            chaves e respetivo conteúdo como valor
         """
         data = []
         for t in self.biometric_templates:
@@ -111,6 +106,16 @@ class DG6:
                          'bdb_type': t.bdb_type,
                          'bdb': t.bdb})
         return data
+        
+    def encode(self):
+        """Codificados os dados do DG6 com ASN1.
+        
+        Retorna:
+        --------
+        hex_data : str
+            dados do DG6 codificados em hexadecimal
+        """
+        return asn1.encode(self, './data_groups/configs/dg6.json')
 
     def hash(self):
         """ Calcula o valor de hash dos dados do DG1.
@@ -120,8 +125,8 @@ class DG6:
         digest : str
             valor de hash
         """
-        data = "".join(t.version + t.bdb_owner + t.bdb_type + t.bdb
-                        for t in self.biometric_templates)
+        data = "".join([t.version + t.bdb_owner + t.bdb_type + t.bdb
+                        for t in self.biometric_templates])
 
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
         digest.update(data.encode())
