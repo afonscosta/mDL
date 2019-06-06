@@ -1,18 +1,7 @@
-# some_file.py
 import sys
-sys.path.insert(0, '../')
 import asn1_parser as asn1
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-
-def int_to_hex(integer):
-    hex_text = format(integer, 'x')
-    if len(hex_text) % 2 == 1:
-        hex_text = '0' + hex_text
-    return hex_text
-
-def hex_to_int(hex_text):
-    return int(hex_text, 16)
 
 class EF_COM:
     def __init__(self, data):
@@ -49,9 +38,8 @@ class EF_COM:
 
 
     def __str__(self):
-        return ';'.join([
-            self.version,\
-            str(self.tag_list)])
+        return 'Version: ' + self.version + '\n' +\
+                'DG\'s available: ' + ', '.join(self.tag_list)
     
 
     def get_data(self, permissions):
@@ -72,13 +60,3 @@ class EF_COM:
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
         digest.update(data.encode())
         return digest.finalize()
-
-
-
-
-#DATA = {'version': '0100', 'tag_list': ['61', '75', '62']}
-#ef_com1 = EF_COM(DATA)
-#ef_com1.save('ef_com.txt')
-
-#ef_com2 = EF_COM('ef_com.txt')
-#print(ef_com2)

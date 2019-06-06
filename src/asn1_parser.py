@@ -7,31 +7,34 @@ regex_between = lambda hex_code_1, hex_code_2: \
                     hex_to_char(hex_code_1) + '-' + hex_to_char(hex_code_2)
 
 # Special characters
-S = ''.join([regex_between('20', '2F'),
-              hex_to_char('3A'),
-              regex_between('3C', '40'),
-              regex_between('5B', '60'),
-              regex_between('7B', '7E'),
-              regex_between('A1', 'AC'),
-              regex_between('A5', 'AE'),
-              regex_between('A7', 'BF')
-            ])
+S = ''.join([
+    regex_between('20', '2F'),
+    hex_to_char('3A'),
+    regex_between('3C', '40'),
+    regex_between('5B', '60'),
+    regex_between('7B', '7E'),
+    regex_between('A1', 'AC'),
+    regex_between('A5', 'AE'),
+    regex_between('A7', 'BF')
+])
 
 # Numeric character
 N = regex_between('30', '39')
 
 # Alphabetic character
-A = ''.join([regex_between('41', '5A'),
-              regex_between('61', '7A'),
-              regex_between('C0', 'D6'),
-              regex_between('D8', 'F6'),
-              regex_between('F8', 'FF')
-            ])
+A = ''.join([
+    regex_between('41', '5A'),
+    regex_between('61', '7A'),
+    regex_between('C0', 'D6'),
+    regex_between('D8', 'F6'),
+    regex_between('F8', 'FF')
+])
 
-DG_TAGS = { '01': '61',
-            '06': '75',
-            '0A': '62'
-          }
+DG_TAGS = {
+    '01': '61',
+    '06': '75',
+    '0A': '62'
+}
 
 # Delimiters
 D = ';×÷'
@@ -268,7 +271,7 @@ def data_to_hex(data, encode, length = None):
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
-    # Codificação das lista de tags dos data groups
+    # Codificação das lista de tags dos data groups (EF.COM)
     elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
         try:
             content = ''
@@ -287,7 +290,7 @@ def data_to_hex(data, encode, length = None):
         except:
             raise Exception('ERROR: Wrong BDB format.')
     
-    # Codificação da versão
+    # Codificação da versão para o EF.COM
     elif encode and encode.upper() == 'VERSION_ENCODE':
         try:
             content = ''
@@ -389,7 +392,7 @@ def hex_to_data(hex_data, encode, decode):
         except:
             raise Exception('ERROR: Wrong data group or tags format.')
 
-    # Codificação dos data groups e respetivas tags
+    # Codificação dos data groups e respetivas tags (EF.COM)
     elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
         content = []
         all_tags = list(DG_TAGS.values())
@@ -412,7 +415,7 @@ def hex_to_data(hex_data, encode, decode):
         except:
             raise Exception('ERROR: Wrong BDB format.')
     
-    # Codificação da versão
+    # Codificação da versão para o EF.COM
     elif encode and encode.upper() == 'VERSION_ENCODE':
         try:
             content = ''
