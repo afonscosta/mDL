@@ -6,6 +6,13 @@ from data_groups import ef_groupAccess
 from data_groups import ef_sod
 
 class mDL:
+    # Mapeamento entre a tag e o número do DG
+    TAGS = {
+        '61': 1,
+        '75': 6,
+        '62': 10
+    }
+
     def __init__(self, data=None):
         """
         Parâmetros
@@ -25,22 +32,18 @@ class mDL:
             #self.ef_sod = ef_sod.EF_SOD(data['ef_sod'])
 
     def load(self):
-        """ Carrega os dados do mDL dos ficheiros respetivos, codificados com ASN1.
-
-        Retorna
-        -------
-        data : dict
-            dicionário com os nomes dos grupos de dados como chaves
-            e respetivo conteúdo como valor
-        """
+        """ Carrega os dados do mDL dos ficheiros respetivos, codificados com ASN1."""
         self.dg1 = dg1.DG1('./data_groups/asn1_hex_data/dg1.txt')
         self.dg6 = dg6.DG6('./data_groups/asn1_hex_data/dg6.txt')
         self.dg10 = dg10.DG10('./data_groups/asn1_hex_data/dg10.txt')
         self.ef_com = ef_com.EF_COM('./data_groups/asn1_hex_data/ef_com.txt')
-        self.ef_groupAccess = ef_groupAccess.EF_GroupAccess('./data_groups/asn1_hex_data/ef_groupAccess.txt')
+        self.ef_groupAccess = ef_groupAccess.EF_GroupAccess(
+            './data_groups/asn1_hex_data/ef_groupAccess.txt'
+        )
         #self.ef_sod = ef_sod.EF_SOD('./data_groups/asn1_hex_data/ef_sod.txt')
 
     def save(self):
+        """ Guarda os dados do mDL nos ficheiros respetivos, codificados com ASN1."""
         self.dg1.save('./data_groups/asn1_hex_data/dg1.txt')
         self.dg6.save('./data_groups/asn1_hex_data/dg6.txt')
         self.dg10.save('./data_groups/asn1_hex_data/dg10.txt')
@@ -49,109 +52,122 @@ class mDL:
         #self.ef_sod.save('./data_groups/asn1_hex_data/ef_sod.txt')
 
     def set_permissions(self, allow):
+        """ Define quais os DG's que têm permissão para serem acedidos.
+
+        Parâmetros
+        ----------
+        allow : dict
+            dicionário com o número do DG, que se pretende permitir o acesso,
+            como chave e respetiva tag como valor
+        """
         self.ef_groupAccess.set_permissions(allow)
 
-    def get_data(self):
-        result = {}
-        if self.ef_groupAccess.is_allowed(1):
-            result[1] = self.dg1.get_data()
-        if self.ef_groupAccess.is_allowed(6):
-            result[6] = self.dg6.get_data()
-        if self.ef_groupAccess.is_allowed(10):
-            result[10] = self.dg10.get_data()
-        return str(result)
+    def add_permissions(self, allow):
+        """ Adiciona novos DG's aos que têm permissão para serem acedidos.
 
-    def get_data_hex(self):
-        result = ''
-        if self.ef_groupAccess.is_allowed(1):
-            result += self.dg1.encode()
-        if self.ef_groupAccess.is_allowed(6):
-            result += self.dg6.encode()
-        if self.ef_groupAccess.is_allowed(10):
-            result += self.dg10.encode()
-        return result
+        Parâmetros
+        ----------
+        allow : dict
+            dicionário com o número do DG, que se pretende permitir o acesso,
+            como chave e respetiva tag como valor
+        """
+        self.ef_groupAccess.add_permissions(allow)
 
-    def auth_source(self):
+    def get_dg(self, num_dg):
+        """
+        Devolve o DG do mDL que corresponde ao número passado por argumento.
+
+        Parâmetros
+        ----------
+        num_dg : int
+            número de um DG
+
+        Retorna
+        -------
+        dg : class
+            classe do DG presente no mDL
+        """
+        dg = None
+        if num_dg == 1:
+            dg = self.dg1
+        elif num_dg == 6:
+            dg = self.dg6
+        elif num_dg == 10:
+            dg = self.dg10
+        return dg
+
+    def get_data(self, data_group_tags):
+        """ Devolve um dicionário com os dados do mDL,
+        que se pretendem aceder e que podem ser acedidos.
+
+        Parâmetros
+        ----------
+        data_groups : list
+            lista com o número do DG que se pretende aceder
+
+        Retorna
+        -------
+        data : dict
+            dicionário com os números dos DG's como chaves
+            e respetivo conteúdo num dicionário como valor
+        """
+        data = {}
+        for tag in data_group_tags:
+            num_dg = self.TAGS[tag]
+            if self.ef_groupAccess.is_allowed(num_dg):
+                data[num_dg] = self.get_dg(num_dg).get_data()
+        return data
+
+    def get_data_hex(self, data_group_tags):
+        """Devolve os dados do mDL que se pretende aceder
+        e que podem ser acedidos, codificados em ASN1.
+
+        Parâmetros
+        ----------
+        data_groups : list
+            lista com o número do DG que se pretende aceder
+
+        Retorna:
+        --------
+        hex_data : str
+            dados do mDL codificados em hexadecimal
+        """
+        hex_data = ''
+        for tag in data_group_tags:
+            num_dg = self.TAGS[tag]
+            if self.ef_groupAccess.is_allowed(num_dg):
+                hex_data += self.get_dg(num_dg).encode()
+        return hex_data
+
+    def get_signature(self):
+        """ Devolve a assinatura dos dados do mDL.
+
+        Retorna:
+        --------
+        signature : str
+            assinatura dos dados do mDL
+        """
+        # return self.ef_sod.get_signature()
         pass
 
-    def connect_info_with_owner(self):
+    def get_digests(self, data_groups):
+        """ Devolve os digests dos DG's do mDL.
+
+        Retorna:
+        --------
+        digests : dict
+            dicionário em que a chave é o número do DG e
+            o valor é o respetivo digest
+        """
+        # return self.ef_sod.get_digests(data_groups)
         pass
 
-    def verify_integraty(self):
-        pass
+    def get_available_data_groups(self):
+        """ Devolve as tags dos DG's presentes no mDL.
 
-    def allow_info(self):
-        pass
-
-    def request_info(self):
-        # Autorizar ou não
-        # Fazer update das autorizações
-        pass
-
-
-with open("face-image.jpg", "rb") as fd:
-    image_bytes = fd.read()
-
-DATA = {
-    'dg1': {
-        'family_name': 'Smithe Williams',
-        'name': 'Alexander George Thomas',
-        'date_of_birth': '19700301',
-        'date_of_issue': '20020915',
-        'date_of_expiry': '20070930',
-        'issuing_country': 'JPN',
-        'issuing_authority': 'HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC',
-        'license_number': 'A290654395164273X',
-        'number_of_entries': 1,
-        'categories_of_vehicles': [
-            'C1;20000315;20100314;S01;<=;38303030',
-            'C1;20000315;20100314;S01;<=;38303030'
-        ]
-    },
-    'dg6': {
-        'biometric_templates': [
-            {
-                'version': 257,
-                'bdb_owner': 257,
-                'bdb_type': 8,
-                'bdb': image_bytes[:64000]
-            },
-            {
-                'version': 257,
-                'bdb_owner': 257,
-                'bdb_type': 8,
-                'bdb': image_bytes[64000:65000]
-            }
-        ],
-        'number_of_entries': 1
-    },
-    'dg10': {
-        'version': '1',
-        'last_update': '20130115000000',
-        'expiration_date': '20130314235959',
-        'next_update': '20130122000000',
-        'management_info': 'info'
-    },
-    'ef_groupAccess': {
-        1: '61',
-        10: '62'
-    },
-    'ef_com': {
-        'version': '0100',
-        'tag_list': ['61', '75', '62']
-    }
-}
-
-mdl = mDL(DATA)
-mdl.save()
-#mdl.dg1.set_permissions(['family_name', 'categories_of_vehicles'])
-#print(mdl.dg1.hash())
-
-mdl_loaded = mDL()
-print('- All DG1:', mdl_loaded.dg1, sep="\n")
-print('\n- All DG6:', mdl_loaded.dg6, sep="\n")
-print('\n- All DG10:', mdl_loaded.dg10, sep="\n")
-print('\n- All COM:', mdl_loaded.ef_com, sep="\n")
-print('\n- All GroupAccess:', mdl_loaded.ef_groupAccess, sep="\n")
-print('\n- Allowed:', mdl_loaded.get_data(), sep="\n")
-print('\n- Allowed HEX:', mdl_loaded.get_data_hex(), sep="\n")
+        Retorna:
+        --------
+        tag_list : list
+            lista de tags
+        """
+        return self.ef_com.get_data()['tag_list']

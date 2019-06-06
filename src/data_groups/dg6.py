@@ -101,6 +101,9 @@ class DG6:
         """
         data = []
         for t in self.biometric_templates:
+            print('before')
+            print(t)
+            print('after')
             data.append({'version': t.version,
                          'bdb_owner': t.bdb_owner,
                          'bdb_type': t.bdb_type,

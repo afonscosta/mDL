@@ -66,7 +66,19 @@ class EF_GroupAccess:
         self.allowed_data_groups = {}
         for dg, tag in allowed.items():
             self.allowed_data_groups[dg] = tag
-    
+
+    def add_permissions(self, allowed):
+        """ Adiciona novos campos que têm autorização para serem lidos.
+
+        Parâmetros
+        ----------
+        allowed : dict
+            dicionário com os números dos data groups como chaves e uma lista das
+            tags cujo acesso ao conteúdo é permitido como valor
+        """
+        for dg, tag in allowed.items():
+            self.allowed_data_groups[dg] = tag
+
     def is_allowed(self, dg):
         """ Obtém indicação se acesso a determinado data group é permitido.
 
