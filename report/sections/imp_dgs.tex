@@ -12,7 +12,7 @@ Para maximizar a modularidade do sistema, a implementação de cada um dos grupo
     \item Geração de um valor de \textit{hash} sobre os valores de um dado grupo de dados.
 \end{itemize}
 
-Excecionalmente, o ficheiro \texttt{EF_GroupAccess} é responsável pelo estabelecimento e gestão de permissões de acesso dos grupos de dados. Por fim, o ficheiro \texttt{EF_SOD} é responsável por guardar a \textit{hash} coletiva do sistema, bem como armazenar os seus certificados e assinaturas digitais.
+Excecionalmente, o ficheiro \texttt{EF\_GroupAccess} é responsável pelo estabelecimento e gestão de permissões de acesso dos grupos de dados. Por fim, o ficheiro \texttt{EF\_SOD} é responsável por guardar a \textit{hash} coletiva do sistema, bem como armazenar os seus certificados e assinaturas digitais.
 
 Para facilitar o acesso aos dados, foi desenvolvido também uma estrutura JSON para cada um deles que delimita a ordem de entrada e tipo de cada um dos campos para o respetivo DG. Para cada campo, é definida a sua \textit{tag} (se relevante), o seu comprimento em \textit{bytes} e quaisquer limitações de \textit{input} a qual esteja sujeito.
 
