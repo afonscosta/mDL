@@ -11,11 +11,25 @@ SHA256 = "AlgorithmIdentifier  ::=  {\nalgorithm id-sha256,\nparameters nullPara
 class EF_SOD:
 
     def __init__(self, data):
+        """
+        Parâmetros
+        ----------
+        data : dict
+            dicionário com os nomes das variáveis de instância como chaves
+            e respetivo conteúdo como valor
+        """
         if isinstance(data, str):
             data = self.load(data)
 
 
     def save(self, filename):
+        """Armazena os dados do EF_SOD num ficheiro.
+
+        Parâmetros:
+        -----------
+        filename : str
+            nome do ficheiro onde se pretende armazenar os dados
+        """
         with open(filename, 'w+') as fp:
             data = "SignedData ::= SEQUENCE {\n"
             data.append("certificates [0] IMPLICIT " + self.certificates + " OPTIONAL,\n")
@@ -44,6 +58,19 @@ class EF_SOD:
 
 
     def load(self, filename):
+        """ Carrega os dados do EF_SOD de um ficheiro.
+        
+        Parâmetros
+        ----------
+        filename : str
+            nome do ficheiro a partir do qual se pretende obter os dados
+        
+        Retorna
+        -------
+        data : dict
+            dicionário com os nomes das variáveis de instância como chaves
+            e respetivo conteúdo como valor
+        """
         if isinstance(data, str):
             data = self.load(data)
 
@@ -54,6 +81,13 @@ class EF_SOD:
             self.data_group_hash
 
 
+""" Calcula o valor de hash dos dados do EF_SOD.
+
+        Retorna
+        -------
+        digest : str
+            valor de hash
+        """
     def hash(self):
         hash = ""
         hash.join(DG1("asn1_hex_data/dg1.txt").hash())
