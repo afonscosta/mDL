@@ -18,20 +18,45 @@ class EF_COM:
         self.tag_list = data['tag_list']
 
     def save(self, filename):
+        """Armazena os dados do DG1 num ficheiro, codificados com ASN1.
+
+        Parâmetros:
+        -----------
+        filename : str
+            nome do ficheiro onde se pretende armazenar os dados
+        """
         with open(filename, 'w+') as fp:
             hex_data = asn1.encode(self, './data_groups/configs/ef_com.json')
-            #hex_data = asn1.encode(self, './configs/ef.com.json')
             fp.write(hex_data)
 
 
     def load(self, filename):
+        """ Carrega os dados do DG1 de um ficheiro, codificado com ASN1.
+
+        Parâmetros
+        ----------
+        filename : str
+            nome do ficheiro a partir do qual se pretende obter os dados
+
+        Retorna
+        -------
+        data : dict
+            dicionário com os nomes das variáveis de instância como chaves
+            e respetivo conteúdo como valor
+        """
         with open(filename, 'r') as fp:
             data = asn1.decode(fp.read(), './data_groups/configs/ef_com.json')
-            #data = asn1.decode(fp.read(), './configs/ef.com.json')
         return data
 
 
     def __str__(self):
+        """ Retorna uma string que apresenta os dados do DG1
+
+        Retorna
+        -------
+        data : str
+            string com os dados do DG1
+        """
         return 'Version: ' + self.version + '\n' +\
                 'DG\'s available: ' + ', '.join(self.tag_list)
 
@@ -50,6 +75,13 @@ class EF_COM:
         return data
 
     def hash(self):
+        """ Calcula o valor de hash dos dados do DG1.
+
+        Retorna
+        -------
+        digest : str
+            valor de hash
+        """
         data = self.version + self.version +\
             "".join(self.tag_list) #TODO: está bem assim? divisores?
             # self.number_of_entries + self.categories_of_vehicles (TODO: number_of_entries é preciso?)

@@ -3,7 +3,7 @@ from data_groups import dg6
 from data_groups import dg10
 from data_groups import ef_com
 from data_groups import ef_groupAccess
-from data_groups import ef_sod
+# from data_groups import ef_sod
 
 class mDL:
     # Mapeamento entre a tag e o número do DG

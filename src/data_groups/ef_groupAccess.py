@@ -3,13 +3,18 @@ import asn1_parser as asn1
 class EF_GroupAccess:
     def __init__(self, data):
         """
+        Parâmetros
+        ----------
+        data : dict
+            dicionário com os nomes das variáveis de instância como chaves
+            e respetivo conteúdo como valor
         """
         if isinstance(data, str):
             self.allowed_data_groups = self.load(data)['allowed_data_groups']
         else:
             self.allowed_data_groups = {}
             for dg, tag in data.items():
-                self.allowed_data_groups[dg] = tag
+                self.allowed_data_groups[int(dg)] = tag
 
     def save(self, filename):
         """Armazena os dados do GroupAccess num ficheiro, codificados com ASN1.

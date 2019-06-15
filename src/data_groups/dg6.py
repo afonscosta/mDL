@@ -7,7 +7,11 @@ class BiometricTemplate:
         self.version = version if version is not None else '0101'
         self.bdb_owner = bdb_owner
         self.bdb_type = bdb_type
-        self.bdb = bdb
+        if isinstance(bdb, str):
+            with open(bdb, "rb") as fd:
+                self.bdb = fd.read()
+        else:
+            self.bdb = bdb
     
     def __str__(self):
         return '(' + ', '.join([str(self.version), str(self.bdb_owner), str(self.bdb_type), str(self.bdb)[:20] + '...']) + ')'
