@@ -159,7 +159,7 @@ class mDL:
             dicionário em que a chave é o número do DG e
             o valor é o respetivo digest
         """
-        # return self.ef_sod.get_digests(data_groups)
+        # return self.ef_sod.get_digests()
         pass
 
     def get_available_data_groups(self):
