@@ -13,10 +13,10 @@ key = rsa.generate_private_key(
     backend=default_backend()
 )
 # Write our key to disk for safe keeping
-with open("./key.pem", "wb") as f:
+with open("./key.der", "wb") as f:
     f.write(key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.BestAvailableEncryption(b"passphrase"),
     ))
 
@@ -40,5 +40,5 @@ csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
 # Sign the CSR with our private key.
 ).sign(key, hashes.SHA256(), default_backend())
 # Write our CSR out to disk.
-with open("./csr.pem", "wb") as f:
-    f.write(csr.public_bytes(serialization.Encoding.PEM))
+with open("./csr.der", "wb") as f:
+    f.write(csr.public_bytes(serialization.Encoding.DER))

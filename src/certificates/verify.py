@@ -4,12 +4,12 @@ from OpenSSL import crypto
 from cryptography.hazmat.backends import default_backend
 from cryptography import x509
 
-def verify_cert(cert_pem, cn):
-    cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert_pem)
+def verify_cert(cert_der, cn):
+    cert = crypto.load_certificate(crypto.FILETYPE_ASN1, cert_der)
     if cert.get_subject().CN != cn:
         raise crypto.Error()
-    with open("CA/certificate.pem", "rb") as f:
-        ca_cert = crypto.load_certificate(crypto.FILETYPE_PEM, f.read())
+    with open("CA/certificate.der", "rb") as f:
+        ca_cert = crypto.load_certificate(crypto.FILETYPE_ASN1, f.read())
     old_cert_cn = None
     new_cert_cn = cert.get_subject().CN
     verify = False
@@ -34,7 +34,7 @@ def verify_cert(cert_pem, cn):
         raise crypto.Error
 
 
-with open("./certificate.pem", "rb") as f:
-    cert_pem = f.read()
+with open("./certificate.der", "rb") as f:
+    cert_der = f.read()
 
-verify_cert(cert_pem, u"mysite1.com")
+verify_cert(cert_der, u"mysite1.com")

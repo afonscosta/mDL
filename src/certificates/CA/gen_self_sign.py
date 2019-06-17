@@ -13,10 +13,10 @@ key_self_sign = rsa.generate_private_key(
     backend=default_backend()
 )
 # Write our key to disk for safe keeping
-with open("key_self_sign.pem", "wb") as f:
+with open("key_self_sign.der", "wb") as f:
     f.write(key_self_sign.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.BestAvailableEncryption(b"passphrase"),
     ))
 
@@ -48,5 +48,5 @@ cert = x509.CertificateBuilder().subject_name(
 # Sign our certificate with our private key
 ).sign(key_self_sign, hashes.SHA256(), default_backend())
 # Write our certificate out to disk.
-with open("./certificate.pem", "wb") as f:
-    f.write(cert.public_bytes(serialization.Encoding.PEM))
+with open("./certificate.der", "wb") as f:
+    f.write(cert.public_bytes(serialization.Encoding.DER))

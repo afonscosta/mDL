@@ -4,18 +4,18 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.serialization import load_der_private_key
 import datetime
 import sys
 
-with open("./key_self_sign.pem", "rb") as f:
-    key_self_sign = load_pem_private_key(f.read(), password=b"passphrase", backend=default_backend())
+with open("./key_self_sign.der", "rb") as f:
+    key_self_sign = load_der_private_key(f.read(), password=b"passphrase", backend=default_backend())
 
-with open("./certificate.pem", "rb") as f:
-    ca_cert = x509.load_pem_x509_certificate(f.read(), default_backend())
+with open("./certificate.der", "rb") as f:
+    ca_cert = x509.load_der_x509_certificate(f.read(), default_backend())
 
-with open("../csr.pem", "rb") as f:
-    csr = x509.load_pem_x509_csr(f.read(), default_backend())
+with open("../csr.der", "rb") as f:
+    csr = x509.load_der_x509_csr(f.read(), default_backend())
 
 subject = issuer = x509.Name([
     x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
@@ -45,5 +45,5 @@ cert = x509.CertificateBuilder().subject_name(
 ).sign(key_self_sign, hashes.SHA256(), default_backend())
 
 # Write our certificate out to disk.
-with open("../certificate.pem", "wb") as f:
-    f.write(cert.public_bytes(serialization.Encoding.PEM))
+with open("../certificate.der", "wb") as f:
+    f.write(cert.public_bytes(serialization.Encoding.DER))
