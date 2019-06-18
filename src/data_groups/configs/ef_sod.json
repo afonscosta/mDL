@@ -1,0 +1,57 @@
+{
+    "signed_data": {
+        "keyword": "SignedData ::= SEQUENCE {",
+        "content": {
+            "digest_algorithms": {
+                "keyword": "digestAlgorithms ::= {",
+                "content_list": {
+                    "keyword": "digestAlgorithm ::= ",
+                    "digest_algorithm": {
+                        "constraints": "[a-zA-Z0-9()\\-]+"
+                    }
+                }        
+            },
+            "certificates": {
+                "keyword": "certificates [0]",
+                "content_list": {
+                    "keyword": "SubjectKeyIdentifier [0]",
+                    "constraints": "[0-9A-F:]+"
+                }
+            },
+            "signer_info": {
+                "keyword": "SignerInfo ::= SEQUENCE {",
+                "content": {
+                    "signer_id": {
+                        "keyword": "sid",
+                        "constraints": "[0-9A-F:]+"
+                    },
+                    "digest_algorithm": {
+                        "keyword": "digestAlgorithm",
+                        "constraints": "[a-zA-Z0-9()\\-]+"
+                    },
+                    "signature_algorithm": {
+                        "keyword": "signatureAlgorithm",
+                        "constraints": "[a-zA-Z0-9()\\-]+"
+                    },
+                    "signature": {
+                        "keyword": "signature"//,
+                        //"constraints": 
+                    }
+                }
+            }
+        }
+    },
+
+    "data_group_hash": {
+        "keyword": "DataGroupHash ::= SEQUENCE {",
+        "content_list": {
+            "data_group_number": {
+                "constraints": "\\d+"
+            },
+            "data_group_hash_value": {
+                "constraints": "[0-9A-F]+"
+            }
+        }
+    }
+}
+
