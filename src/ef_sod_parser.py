@@ -9,9 +9,7 @@ class Data(Sequence):
     )
 
 class DataGroupHash(SequenceOf):
-    componentType = NamedTypes(
-        Data()
-    )
+    componentType = Data()
 
 class Record(Sequence):
     componentType = NamedTypes(
@@ -19,7 +17,7 @@ class Record(Sequence):
         NamedType('signatureAlgorithm', UniversalString()),
         NamedType('certificate', OctetString()),
         NamedType('signature', OctetString()),
-        DataGroupHash()
+        NamedType('dataGroupHash', DataGroupHash())
     )
 
 record = Record()
@@ -27,9 +25,15 @@ record['digestAlgorithm'] = 'id-sha256'
 record['signatureAlgorithm'] = 'id-pk-RSA-PKCS1-v1_5-SHA256'
 record['certificate'] = b'43a541'
 record['signature'] = b'468a4b'
-record['DataGroupHash'] = [{
-    'dataGroupNumber': 1,
-    'dataGroupHashValue': b'a2354'
-}]
+data1 = Data()
+data1['dataGroupNumber'] = 1
+data1['dataGroupHashValue'] = b'11111'
+data2 = Data()
+data2['dataGroupNumber'] = 2
+data2['dataGroupHashValue'] = b'22222'
+dataGroupHash = DataGroupHash()
+dataGroupHash.setComponentByPosition(0, data1)
+dataGroupHash.setComponentByPosition(1, data2)
+record['dataGroupHash'] = dataGroupHash
 
 print(record)
