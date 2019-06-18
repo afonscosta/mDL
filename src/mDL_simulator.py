@@ -12,6 +12,11 @@ if len(sys.argv) > 1:
         sys.exit()
     with open(sys.argv[1], "r") as fd:
         DATA = json.load(fd)
+        for bt in DATA['dg6']['biometric_templates']:
+            FILENAME = bt['bdb']
+            with open(FILENAME, "rb") as fd:
+                IMAGE = fd.read()
+                bt['bdb'] = IMAGE
 
 MDLT = mDL_transaction(DATA)
 MDLT.open()

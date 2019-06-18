@@ -21,6 +21,12 @@
                 "bdb_owner": 257,
                 "bdb_type": 8,
                 "bdb": "picture.jpg"
+            },
+            {
+                "version": 257,
+                "bdb_owner": 257,
+                "bdb_type": 8,
+                "bdb": "picture.jpg"
             }
         ],
         "number_of_entries": 1
