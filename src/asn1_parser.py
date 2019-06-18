@@ -1,6 +1,7 @@
 import json
 import bcd
 import re
+import inspect
 
 hex_to_char = lambda hex_code: re.escape(chr(int(hex_code,16)))
 regex_between = lambda hex_code_1, hex_code_2: \
@@ -221,7 +222,6 @@ def data_to_hex(data, encode, length = None):
         se dados de input apresentam um tipo diferente de int
         ou str
     """
-
     # Codificação BCD
     if encode and encode.upper() == 'BCD':
         if isinstance(data, str) and data.isdigit():
@@ -616,7 +616,7 @@ def asn1_encode(data_group, config, last_key = None):
     hex_result = ''
     data = None
     content = None
-
+    
     # Se existe conteúdo codifica-o
     if 'content' in config:
         content = ''
@@ -624,10 +624,20 @@ def asn1_encode(data_group, config, last_key = None):
             content += asn1_encode(data_group, config['content'][c], c)
     # Se não, obtém o conteúdo da respetiva variável do 'data_group'
     else:
-        data = getattr(data_group, last_key)
+        if hasattr(data_group,last_key):
+            data = getattr(data_group, last_key)
+        elif isinstance(data_group, dict):
+            data = data_group[last_key]
+        else: 
+            print('HERE ' + str(config))
+            raise Exception('ERROR: Data provider must be a class or dict and must obey configuration.')
     
     # Se é lista, valida restrições e codifica cada elemento da variável
     if 'size_list' in config:
+        if config['size_list'] and hasattr(data_group, config['size_list']) and \
+                getattr(data_group, config['size_list']) != len(data):
+            raise Exception('ERROR: Provided list length differs from actual length.')
+        
         if 'compost_content' in config:
             for elem in data:
                 content = asn1_encode(elem, {'content': config['compost_content']}, last_key)

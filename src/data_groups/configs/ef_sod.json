@@ -1,57 +1,40 @@
 {
-    "signed_data": {
-        "keyword": "SignedData ::= SEQUENCE {",
-        "content": {
-            "digest_algorithms": {
-                "keyword": "digestAlgorithms ::= {",
-                "content_list": {
-                    "keyword": "digestAlgorithm ::= ",
-                    "digest_algorithm": {
-                        "constraints": "[a-zA-Z0-9()\\-]+"
-                    }
-                }        
-            },
-            "certificates": {
-                "keyword": "certificates [0]",
-                "content_list": {
-                    "keyword": "SubjectKeyIdentifier [0]",
-                    "constraints": "[0-9A-F:]+"
-                }
-            },
-            "signer_info": {
-                "keyword": "SignerInfo ::= SEQUENCE {",
-                "content": {
-                    "signer_id": {
-                        "keyword": "sid",
-                        "constraints": "[0-9A-F:]+"
-                    },
-                    "digest_algorithm": {
-                        "keyword": "digestAlgorithm",
-                        "constraints": "[a-zA-Z0-9()\\-]+"
-                    },
-                    "signature_algorithm": {
-                        "keyword": "signatureAlgorithm",
-                        "constraints": "[a-zA-Z0-9()\\-]+"
-                    },
-                    "signature": {
-                        "keyword": "signature"//,
-                        //"constraints": 
+    "tag": "77",
+    "length": "var",
+    "content": {
+        "digest_algorithm": {
+            "length": "var",
+            "constraints": "(id-sha1|id-sha224|id-sha256|id-sha384|id-sha512)"
+        },
+        "signature_algorithm": {
+            "length": "var",
+            "constraints": "(id-pk-RSA-PKCS1-v1_5-SHA1|id-pk-RSA-PKCS1-v1_5-SHA256|id-pk-RSA-PSS-SHA1|id-pk-RSA-PSS-SHA256|id-pk-ECDSA-SHA1|id-pk-ECDSA-SHA224|id-pk-ECDSA-SHA256)"
+        },
+        "certificate": {
+            "length": "var",
+            "encode": "NO_ENCODE"
+        },
+        "signature": {
+            "length": "var"
+        },
+        "data_group_hash_list": {
+            "length": "var",
+            "content": {
+                "data_group_hash": {
+                    "size_list": "not_defined",
+                    "tag": "78",
+                    "length": "var",
+                    "compost_content": {
+                        "data_group_number": {
+                            "length": "var",
+                            "decode": "int"
+                        },
+                        "data_group_hash_value": {
+                            "length": "var"
+                        }
                     }
                 }
-            }
-        }
-    },
-
-    "data_group_hash": {
-        "keyword": "DataGroupHash ::= SEQUENCE {",
-        "content_list": {
-            "data_group_number": {
-                "constraints": "\\d+"
-            },
-            "data_group_hash_value": {
-                "constraints": "[0-9A-F]+"
-            }
+            } 
         }
     }
 }
-
