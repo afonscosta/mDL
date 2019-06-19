@@ -42,24 +42,27 @@ assinatura, pertence efetivamente à IA que emitiu a IDL.
 No entanto, caso algum dos passos anteriores não seja válido, então significa
 que pelo menos um dos seguintes aspetos aconteceu:
 \begin{itemize}
-\item a assinatura digital não foi verificada com sucesso;
-\item a chave pública usada não era a correta;
-\item os dados na IDL foram alterados.
+    \setlength\itemsep{0.1em}
+    \item a assinatura digital não foi verificada com sucesso;
+    \item a chave pública usada não era a correta;
+    \item os dados na IDL foram alterados.
 \end{itemize}
 
 
-\vspace{0.6cm}
+\vspace{0.4cm}
 \underline{\textbf{Funções de Hash - Codificação \emph{standard}}}
 \vspace{0.3cm}
 
 Para \emph{standard encoding} a IA deve utilizar funções de hash presentes na
 seguinte lista:
 \begin{itemize}
-\item SHA-1 (apenas por compatibilidade)
-\item SHA-224
-\item SHA-256 (recomendada)
-\item SHA-384
-\item SHA-512
+    \begin{multicols}{2}
+        \item SHA-1 (apenas por compatibilidade)
+        \item SHA-224
+        \item SHA-256 (recomendada)
+        \item SHA-384
+        \item SHA-512
+    \end{multicols}
 \end{itemize}
 
 Um \emph{message digest} é calculado para cada grupo de dados presente na IDL e

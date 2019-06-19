@@ -46,6 +46,25 @@
 }
 %
 
+\lstset{
+    inputencoding=utf8,
+    extendedchars=true,
+    literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+        {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+        {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+        {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+        {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+        {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+        {ã}{{\~a}}1 {õ}{{\~o}}1
+        {Ã}{{\~A}}1 {Õ}{{\~O}}1
+        {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+        {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+        {€}{{\EUR}}1 {£}{{\pounds}}1,
+}
+
 \graphicspath{{images/}{../images/}}
 
 \renewcommand\appendixtocname{Anexos}
@@ -91,10 +110,12 @@ A77364 - Mafalda Nunes\\[1.3cm]
 
 
 \begin{abstract}
-% TODO: Resumo
+O presente trabalho aborda a temática da identificação \textit{mobile}, mais especificamente da \textit{mobile Driving License} (\texttt{mDL}).
+
+Este documento divide-se em duas partes fundamentais, sendo estas a análise do ISO de desmaterialização da Carta de Condução e a implementação da estrutura que dá suporte à \texttt{mDL}, sem perder de vista os algoritmos, as primitivas criptográficas e os \textit{workflows} que garantem a segurança do \texttt{mDL}.
 \end{abstract}
 
-\vspace{0.8cm}
+\newpage
 
 \tableofcontents
 
@@ -105,23 +126,18 @@ A77364 - Mafalda Nunes\\[1.3cm]
 
 \section{Contextualização}
 \subfile{sections/contextualizacao}
-% TODO: MAFALDA
 
 \section{Requisitos}
 \subfile{sections/requisitos}
-% TODO: AFONSO
 
 \section{Estrutura de Dados Lógica}
 \subfile{sections/estrutura_dados}
-% TODO: DANIEL
 
 \section{Transferência de Dados da mDL}
 \subfile{sections/trans_dados}
-% TODO: MAFALDA
 
 \section{Mecanismos de Proteção de Dados da mDL}
 \subfile{sections/mec_seguranca}
-% TODO: AFONSO
 
 \section{Implementação da mDL (ISO \textit{compliant})}
 \subfile{sections/implementacao}
@@ -129,12 +145,10 @@ A77364 - Mafalda Nunes\\[1.3cm]
 \newpage
 \section{Conclusões}
 \subfile{sections/conclusoes}
-% TODO: Conclusões
 
 
 \newpage
 \bibliographystyle{unsrt}
 \bibliography{biblio}
-% TODO: Bibliografia
 
 \end{document}
