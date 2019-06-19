@@ -44,18 +44,11 @@ def add_permissions(self, allow):
 	self.ef_groupAccess.add_permissions(allow)
 \end{Verbatim}
 
-Outra funcionalidade disponibilizada está relacionada com a necessidade de autenticar a origem da informação da mDL\@. Para tal, o processo de autenticação passiva incorpora um mecanismo de validação da assinatura dos dados do mDL\@. De forma a disponibilizar esta funcionalidade tem-se a função \texttt{get\_signature} que devolve a assinatura necessária para que o leitor mDL possa realizar a validação.
+Outra funcionalidade disponibilizada está relacionada com a necessidade de autenticar a origem da informação da mDL\@. Para tal, o processo de autenticação passiva incorpora um mecanismo de validação da assinatura dos dados do mDL\@. De forma a disponibilizar esta funcionalidade tem-se a função \texttt{get\_signature} que devolve as informações necessárias para que o leitor mDL possa realizar a validação. Adicionalmente, o processo de autenticação passiva envolve a validação dos valores de hash dos dados de cada DG\@. Esses mesmo valores também são incorporados na resposta devolvida pela função \texttt{get\_sod\_data\_hex}.
 
 \begin{Verbatim}[frame=single, framerule=0.5mm]
-def get_signature(self):
-    return self.ef_sod.get_signature()
-\end{Verbatim}
-
-Adicionalmente, o processo de autenticação passiva envolve a validação dos valores de hash dos dados de cada DG\@. Da mesma forma, esses mesmos valores podem ser acedidos através da função \texttt{get\_digests} que devolve os \textit{digests} para os DG's pretendidos.
-
-\begin{Verbatim}[frame=single, framerule=0.5mm]
-def get_digests(self, data_groups):
-	return self.ef_sod.get_digests(data_groups)
+def get_sod_data_hex(self):
+    return self.ef_sod.encode()
 \end{Verbatim}
 
 A função \texttt{get\_available\_data\_groups} surge como uma necessidade na implementação do processo de transação existente entre um dispositivo mDL e um leitor mDL\@. Efetivamente, o primeiro passo do mDL envolve a pré-seleção dos dados que podem ser partilhados. Desta forma, a função anterior é necessária para se averiguar quais os DG's que se encontram no mDL, para que, posteriormente, se possa definir as respetivas permissões.
@@ -77,6 +70,8 @@ def get_data_hex(self, data_group_tags):
 	return hex_data
 \end{Verbatim}
 
+Adicionalmente, também é possível aceder aos dados de forma estruturada (sem ser codificados em hexadecimal), através da função \texttt{get\_data}.
+
 
 \subsubsection{Exemplo de utilização}
 
@@ -95,19 +90,36 @@ A classe \texttt{mDL\_transaction} possui a seguinte API:
 A título exemplificativo, o \texttt{mDL\_simulator} assume a seguinte transação:
 
 \begin{Verbatim}[frame=single, framerule=0.5mm]
-import sys
-import json
-from mDL_transaction import mDL_transaction
-DATA = None
-if len(sys.argv) > 1:
-    with open(sys.argv[1], "r") as fd:
-        DATA = json.load(fd)
+(...) # Carregamos do ficheiro JSON com os dados
 MDLT = mDL_transaction(DATA)
 MDLT.open()
-print()
 MDLT.request_additional_data(['61', '62'])
-print()
-print(MDLT.transfer_data(['61', '62']))
+transfer_data = MDLT.transfer_data(['61', '62'])
+transfer_sod_data = MDLT.transfer_sod()
+
+dg1 = dg1.DG1(transfer_data[1])
+dg10 = dg10.DG10(transfer_data[10])
+dgs = {1: dg1, 10: dg10}
+transfer_digests = calculate_digests(dgs, transfer_sod_data['digestAlgorithm'])
+
+(...) # Cálculo do valor dos digests dos DG's que se pretende aceder
+
+digest1 = transfer_sod_data['dataGroupHash'][0]['dataGroupHashValue']
+digest10 = transfer_sod_data['dataGroupHash'][2]['dataGroupHashValue']
+
+(...) # Concatenação dos valores dos digests recebidos do mDL
+
+print('DIGESTS VALIDATION:',
+        transfer_digests[1] == digest1 and\
+        transfer_digests[10] == digest10)
+
+print('SIGNATURE VALIDATION:',
+    verify_signature(
+        sod_digests,
+        bytes(transfer_sod_data['certificate']),
+        bytes(transfer_sod_data['signature']),
+        transfer_sod_data['signatureAlgorithm']
+    ))
 \end{Verbatim}
 
 De forma, a popular o mDL é usado o seguinte ficheiro JSON:
@@ -121,10 +133,9 @@ De forma, a popular o mDL é usado o seguinte ficheiro JSON:
         "date_of_issue": "20020915",
         "date_of_expiry": "20070930",
         "issuing_country": "JPN",
-        "issuing_authority": "HOKKAIDO PREFECTURAL POLICE\
-                              ASAHIKAWA AREA SAFETY PUBLIC",
+        "issuing_authority": "HOKKAIDO PREFECTURAL POLICE ASAHIKAWA AREA SAFETY PUBLIC",
         "license_number": "A290654395164273X",
-        "number_of_entries": 1,
+        "number_of_entries": 2,
         "categories_of_vehicles": [
             "C1;20000315;20100314;S01;<=;38303030",
             "C1;20000315;20100314;S01;<=;38303030"
@@ -137,9 +148,15 @@ De forma, a popular o mDL é usado o seguinte ficheiro JSON:
                 "bdb_owner": 257,
                 "bdb_type": 8,
                 "bdb": "picture.jpg"
+            },
+            {
+                "version": 257,
+                "bdb_owner": 257,
+                "bdb_type": 8,
+                "bdb": "picture.jpg"
             }
         ],
-        "number_of_entries": 1
+        "number_of_entries": 2
     },
     "dg10": {
         "version": "1",
@@ -154,21 +171,27 @@ De forma, a popular o mDL é usado o seguinte ficheiro JSON:
     "ef_com": {
         "version": "0100",
         "tag_list": ["61", "75", "62"]
-	}
+    },
+    "ef_sod": {
+        "digestAlgorithm": "id-sha256",
+        "signatureAlgorithm": "id-pk-RSA-PSS-SHA256",
+        "certificate": "certificates/certificate.der",
+        "signature": "certificates/key.der"
+    }
 }
 \end{lstlisting}
 
 Além de popular os diferentes constituintes do mDL, o JSON apenas permite o acesso ao DG6 através do campo \texttt{ef\_groupAccess}.
 
-De seguida, encontra-se um possível exemplo de simulação, onde é feito uma correlação entre a interação e o processo de transação descrito no ISO.
+De seguida, encontra-se um exemplo de simulação, onde é feito uma correlação entre a interação e o processo de transação descrito no ISO.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{working_example1.png}
+    \includegraphics[width=0.95\textwidth]{working_example2.png}
     \caption{Exemplo de utilização do mDL.}
-	\label{fig:working_example1}
+	\label{fig:working_example2}
 \end{figure}
 
 Neste exemplo o utilizador aceita pre-selecionar os DG's que pretende permitir o acesso, sendo que apenas dá permissão ao DG6. De seguida, é requirido que seja dada permissão de acesso ao DG1 e DG10. O utilizador aceita e os dados são transferidos para o leitor do mDL, para que este possa prosseguir com a operação.
 
-Importa realçar que o processo aqui descrito, que corresponde ao objectivo deste projeto, não envolve a componente de validação descrita no ISO do mDL\@. No entanto, esta não deve ser descurada, não autenticar a origem da informação, ou mesmo a integridade da mesma, pode originar graves problemas de segurança\@.
+Importa realçar que o processo aqui descrito, que corresponde ao objectivo deste projeto, não envolve a componente de validação descrita no ISO do mDL\@. No entanto, esta foi adicionada de forma redimentar de forma a demonstrar o raciocínio necessário no momento de validção. Nesta pequena demonstração foram usados métodos e classes utilizados pelo mDL e, desta forma, teriam que ser reescritos pela entidade verificadora de forma a realizar a verificação de forma totalmente independente do mDL.
