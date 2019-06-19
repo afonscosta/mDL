@@ -3,21 +3,36 @@
 %     - [ ] Funcionalidades (API)
 %     - [ ] JSON específico
 
-% Excecionalmente, o ficheiro \texttt{EF\_GroupAccess} é responsável pelo estabelecimento e gestão de permissões de acesso dos grupos de dados. Por fim, o ficheiro \texttt{EF\_SOD} é responsável por guardar a \textit{hash} coletiva do sistema, bem como armazenar os seus certificados e assinaturas digitais.
+Para cada um dos ficheiros que compõe a estrutura de dados, foi implementada uma \textit{script} com um conjunto de funcionalidades que as permitem criar e gerir os respetivos ficheiros. Estes são depois acedidos pelo \textit{mDL} através da sua API, da qual as \textit{scripts} partilham a capacidade de carregar e escrever os dados do respetivo grupo de dados em ficheiro, bem como codificar o seu conteúdo	para o formato ASN1:
 
-% Para facilitar o acesso aos dados, foi desenvolvido também uma estrutura JSON para cada um deles que delimita a ordem de entrada e tipo de cada um dos campos para o respetivo DG. Para cada campo, é definida a sua \textit{tag} (se relevante), o seu comprimento em \textit{bytes} e quaisquer limitações de \textit{input} a qual esteja sujeito.
+\begin{verbatim}
+def save(self, filename):
+    with open(filename, 'w+') as fp:
+        hex_data = asn1.encode(self, './data_groups/configs/dg1.json')
+        fp.write(hex_data)
 
-Para cada um dos ficheiros que compõe a estrutura de dados, foi implementada uma \textit{script} com um conjunto de funcionalidades que as permitem criar e gerir os respetivos ficheiros. Estes são depois acedidos pelo \textit{mDL} através da sua API, da qual as \textit{scripts} partilham a capacidade de carregar e escrever os dados do respetivo grupo de dados em ficheiro:
+def load(self, filename):
+    with open(filename, 'r') as fp:
+        data = asn1.decode(fp.read(), './data_groups/configs/dg1.json')
+    return data
 
-\begin{lstlisting}[language=Python, caption=Exemplos de funções de inicialização\, escrita e carregamento de dados no DG1]
-    def __init__(self, data):
-    """
-    Parâmetros
-    ----------
-    data : dict
-        dicionário com os nomes das variáveis de instância como chaves
-        e respetivo conteúdo como valor
-    """
+def encode(self):
+    return asn1.encode(self, './data_groups/configs/dg1.json')
+\end{verbatim}
+
+Tanto o carregamento como a escrita destes é executada com a ajuda de um ficheiro JSON que permite alterações à estrutura da implementação sem que haja alterações no código em si. Cada um dos DG's tem o seu próprio JSON no qual são guardadas os seus campos, bem como os respetivos comprimentos em \textit{bytes} e as suas \textit{tags} e é convertido de e para o formato ASN1 consoante a sua leitura e escrita, respetivamente.
+
+\subsection{Data Groups 1, 6 e 10}
+
+Estes DG's são responsáveis por armazenar os dados do titular mDL, bem como os do próprio título mDL. Cada um destes contem um conjunto de funções que as permitem demonstrar o seu conteúdo conforme necessário. Cada um destes tem a sua implementação específica, ainda assim, seguem uma estrutura idêntica. Em particular, a função \texttt{get\_data} preenche e devolve um dicionário com todos os valores do respetivo grupo de dados e a função \texttt{\_\_str\_\_} devolve o conteúdo do mesmo sob a forma de uma \textit{string}. Por fim, é implementada uma função de \textit{hash} que suporta um conjunto de diferentes algoritmos de acordo com o \textit{standard} do mDL, entre os quais, o SHA-1, SHA-224, SHA-256 e SHA-512.
+
+
+\subsubsection{Data Group 1}
+
+Este DG é responsável por armazenar os dados do titular mDL, bem como alguma informação básica do próprio título mDL. Cada um destes contém um conjunto de variáveis de instância correspondentes aos respetivos dados explicitados na estrutura de dados:
+
+\begin{verbatim}
+def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
     self.family_name = data['family_name']
@@ -30,157 +45,13 @@ Para cada um dos ficheiros que compõe a estrutura de dados, foi implementada um
     self.license_number = data['license_number']
     self.number_of_entries = data['number_of_entries']
     self.categories_of_vehicles = data['categories_of_vehicles']
-
-    def save(self, filename):
-        """Armazena os dados do DG1 num ficheiro, codificados com ASN1.
-
-        Parâmetros:
-        -----------
-        filename : str
-            nome do ficheiro onde se pretende armazenar os dados
-        """
-        with open(filename, 'w+') as fp:
-            hex_data = asn1.encode(self, './data_groups/configs/dg1.json')
-            fp.write(hex_data)
-
-    def load(self, filename):
-        """ Carrega os dados do DG1 de um ficheiro, codificado com ASN1.
-
-        Parâmetros
-        ----------
-        filename : str
-            nome do ficheiro a partir do qual se pretende obter os dados
-
-        Retorna
-        -------
-        data : dict
-            dicionário com os nomes das variáveis de instância como chaves
-            e respetivo conteúdo como valor
-        """
-        with open(filename, 'r') as fp:
-            data = asn1.decode(fp.read(), './data_groups/configs/dg1.json')
-        return data
-\end{lstlisting}
-
-Tanto o carregamento como a escrita destes é executada com a ajuda de um ficheiro JSON que permite alterações à estrutura da implementação sem que haja alterações no código em si. Cada um dos DG's tem o seu próprio JSON no qual são guardadas os seus campos, bem como os respetivos comprimentos em \textit{bytes} e as suas \textit{tags} e é convertido de e para o formato ASN1 consoante a sua leitura e escrita, respetivamente.
-
-\subsection{Data Groups 1, 6 e 10}
-
-Estes DG's são responsáveis por armazenar os dados do titular mDL, bem como os do próprio título mDL. Estes contêm um conjunto próprio de funções que as permitem gerar dicionários de dados com a respetiva informação mDL bem como métodos dedicados à sua codificação no formato ASN1 e o seu \textit{hashing} de acordo com um algoritmo da sua escolha:
-
-\begin{lstlisting}[caption=API comum aos DG's exemplificada pelo DG1, language=Python]
-    def encode(self):
-        """Codificados os dados do DG1 com ASN1.
-
-        Retorna:
-        --------
-        hex_data : str
-            dados do DG1 codificados em hexadecimal
-        """
-        return asn1.encode(self, './data_groups/configs/dg1.json')
-
-    def __str__(self):
-    """ Retorna uma string que apresenta os dados do DG1
-
-    Retorna
-    -------
-    data : str
-        string com os dados do DG1
-    """
-    return ';'.join([self.family_name,\
-            self.name,\
-            self.date_of_birth,\
-            self.date_of_issue,\
-            self.date_of_expiry,\
-            self.issuing_country,\
-            self.issuing_authority,\
-            self.license_number,\
-            str(self.number_of_entries),\
-            str(self.categories_of_vehicles)])
-
-            def get_data(self):
-            """ Devolve os dados associados.
-    
-            Retorna
-            -------
-            data : dict
-                dicionário com os nomes das variáveis de instância como
-                chaves e respetivo conteúdo como valor
-            """
-            data = {}
-            data['family_name'] = self.family_name
-            data['name'] = self.name
-            data['date_of_birth'] = self.date_of_birth
-            data['date_of_issue'] = self.date_of_issue
-            data['date_of_expiry'] = self.date_of_expiry
-            data['issuing_country'] = self.issuing_country
-            data['issuing_authority'] = self.issuing_authority
-            data['license_number'] = self.license_number
-            data['number_of_entries'] = self.number_of_entries
-            data['categories_of_vehicles'] = self.categories_of_vehicles
-            return data
-    
-        def hash(self, oid):
-            """ Calcula o valor de hash dos dados do DG1.
-    
-            Retorna
-            -------
-            digest : str
-                valor de hash
-            """
-            data = self.family_name + self.name +\
-                self.date_of_birth + self.date_of_issue +\
-                self.date_of_expiry + self.issuing_country +\
-                self.issuing_authority + self.license_number +\
-                "".join(self.categories_of_vehicles) +\
-                str(self.number_of_entries)
-            if oid == 'id-sha1':
-                digest = hashes.Hash(hashes.SHA1(), backend=default_backend())
-                digest.update(data.encode())
-                return digest.finalize()
-            elif oid == 'id-sha224':
-                digest = hashes.Hash(hashes.SHA224(), backend=default_backend())
-                digest.update(data.encode())
-                return digest.finalize()
-            elif oid == 'id-sha256':
-                digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-                digest.update(data.encode())
-                return digest.finalize()
-            elif oid == 'id-sha384':
-                digest = hashes.Hash(hashes.SHA384(), backend=default_backend())
-                digest.update(data.encode())
-                return digest.finalize()
-            elif oid == 'id-sha512':
-                digest = hashes.Hash(hashes.SHA512(), backend=default_backend())
-                digest.update(data.encode())
-                return digest.finalize()
-            else:
-                print('ERROR: Hash algorithm not implemented.')
-                sys.exit(1)
-\end{lstlisting}
-
-\subsubsection{Data Group 1}
-
-Este DG é responsável por armazenar os dados do titular mDL, bem como alguma informação básica do próprio título mDL. Cada um destes contém um conjunto de variáveis de instância correspondentes aos respetivos dados explicitados na estrutura de dados:
-
-\begin{lstlisting}[caption=Instanciação das variáveis do DG1, language=Python]
-    self.family_name = data['family_name']
-    self.name = data['name']
-    self.date_of_birth = data['date_of_birth']
-    self.date_of_issue = data['date_of_issue']
-    self.date_of_expiry = data['date_of_expiry']
-    self.issuing_country = data['issuing_country']
-    self.issuing_authority = data['issuing_authority']
-    self.license_number = data['license_number']
-    self.number_of_entries = data['number_of_entries']
-    self.categories_of_vehicles = data['categories_of_vehicles']
-\end{lstlisting}
+\end{verbatim}
 
 \subsubsection{Data Group 6}
 
-Este DG contém um conjunto de dados biométricos relativos ao titular, em particular, a sua foto. Para permitir uma melhor gestão deste ficheiro, foi criada uma classe auxiliar \texttt{BiometricTemplate} que guarda cada um dos dados biométricos do DG:
+Este DG contém um conjunto de dados biométricos relativos ao titular, em particular, a sua foto. Para permitir uma melhor gestão deste ficheiro, foi criada uma classe auxiliar \texttt{BiometricTemplate}:
 
-\begin{lstlisting}[caption=Instanciação dos dados do DG6, recorrendo à classe auxiliar, language=Python]
+\begin{verbatim}
 class BiometricTemplate:
     def __init__(self, version, bdb_owner, bdb_type, bdb):
         self.version = version if version is not None else '0101'
@@ -193,23 +64,7 @@ class BiometricTemplate:
 
 
 class DG6:
-    """
-    CLasse utilizada para representar um grupo de dados 6.
-    
-    Atributos
-    ---------
-    
-    Métodos
-    -------
-    """
     def __init__(self, data):
-        """ Construtor da classe DG6.
-
-        Parâmetros
-        ----------
-        data : list
-            lista de dicionários que representam biometric templates
-        """
         if isinstance(data, str):
             data = self.load(data)
         self.biometric_templates = []
@@ -224,95 +79,76 @@ class DG6:
                 )
             )
         self.number_of_entries = data['number_of_entries']
-\end{lstlisting}
+\end{verbatim}
 
+Nesta classe auxiliar, é guardado um único tipo de identificador biométrico, quer seja uma foto, impressão digital, entre outros. Como tal, o DG6 trata-se de um conjunto destes.
 
 \subsubsection{Data Group 10}
 
-Este grupo de dados é responsável por armazenar os dados relativos à gestão do mDL, incluindo a sua data de validade e as datas do último e próximo \textit{updates}.
+Este grupo de dados é responsável por armazenar os dados relativos à gestão do mDL, incluindo a sua data de validade e as datas do último e próximo \textit{updates}. 
 
-\begin{lstlisting}[caption=Instanciação dos dados do DG10, language=Python]
+\begin{verbatim}
+    def __init__(self, data):
+    if isinstance(data, str):
+        data = self.load(data)
     self.version = data['version']
     self.last_update = data['last_update']
     self.expiration_date = data['expiration_date']
     self.next_update = data['next_update']
     self.management_info = data['management_info']
-\end{lstlisting}
+\end{verbatim}
 
-
-\subsection{EF_COM}
+\subsection{EF.COM}
 
 O ficheiro elementar COM é responsável por armazenar as \textit{tags} relativas aos grupos de dados presentes numa dada implementação do mDL.
 
-\begin{lstlisting}[caption=Instanciação de variáveis no EF.COM, language=Python]
+\begin{verbatim}
+def __init__(self, data):
+    if isinstance(data, str):
+        data = self.load(data)
     self.version = data['version']
     self.tag_list = data['tag_list']
-\end{lstlisting}
+\end{verbatim}
 
 Como esta funciona puramente como um meio rápido de averiguar os dados disponíveis ao mDL, este contém apenas as funções de API básica, bem como uma função de exibição de dados semelhante aos grupos de dados anteriormente expostos.
 
 
-\subsection{EF_GroupAccess}
+\subsection{EF.GroupAccess}
 
 Este ficheiro é responsável por guardar a lista de grupos aos quais um titular mDL dá permissões de leitura a um dado requerente mDL.
 
-\begin{lstlisting}[caption=Instanciação dos dados do ficheiro EF.GroupAccess, language=Python]
-    self.allowed_data_groups = {}
-    for dg, tag in data.items():
-        self.allowed_data_groups[int(dg)] = tag
-\end{lstlisting}
+\begin{verbatim}
+def __init__(self, data):
+    if isinstance(data, str):
+        self.allowed_data_groups = self.load(data)['allowed_data_groups']
+    else:
+        self.allowed_data_groups = {}
+        for dg, tag in data.items():
+            self.allowed_data_groups[int(dg)] = tag
+\end{verbatim}
 
 Como este é utilizada sempre que é efetuada uma transação de dados, requer um conjunto de funções que permitam a leitura e gestão do seu conteúdo.
 
-\begin{lstlisting}[caption=API de acesso ao EF.GroupAccess, language=Python]
-    def set_permissions(self, allowed):
-    """ Estabelece os campos que têm autorização para serem lidos.
-
-    Parâmetros
-    ----------
-    allowed : dict
-        dicionário com os números dos data groups como chaves e uma lista das
-        tags cujo acesso ao conteúdo é permitido como valor
-    """
+\begin{verbatim}
+def set_permissions(self, allowed):
     self.allowed_data_groups = {}
     for dg, tag in allowed.items():
         self.allowed_data_groups[dg] = tag
 
 def add_permissions(self, allowed):
-    """ Adiciona novos campos que têm autorização para serem lidos.
-
-    Parâmetros
-    ----------
-    allowed : dict
-        dicionário com os números dos data groups como chaves e uma lista das
-        tags cujo acesso ao conteúdo é permitido como valor
-    """
     for dg, tag in allowed.items():
         self.allowed_data_groups[dg] = tag
 
 def is_allowed(self, dg):
-    """ Obtém indicação se acesso a determinado data group é permitido.
-
-    Parâmetros
-    ----------
-    dg : int
-        identificador do data group
-
-    Retorna
-    -------
-    result : boolean
-        True, se existe permissão para aceder ao data group. False,
-        caso contrário.
-    """
     return dg in self.allowed_data_groups
-\end{lstlisting}
+\end{verbatim}
 
 
 \subsection{Ficheiro EF.SOD}
 
-Este ficheiro é responsável por gerir os valores de \textit{hash} dos dados mDL e gerar assinaturas digitais. Este contém uma estrutura que varia significativamente dos restantes ficheiros e, como tal, contém o seu próprio \textit{parser} demoninado de \texttt{ef_sod_parser}. Como tal, o \textit{encoding} para o formato ASN1 nas funções de leitura e escrita de ficheiros é executada por estes:
+Este ficheiro é responsável por gerir os valores de \textit{hash} dos dados mDL e gerar assinaturas digitais. Este contém uma estrutura que varia significativamente dos restantes ficheiros e, como tal, contém o seu próprio \textit{parser} denominado de \texttt{ef\_sod\_parser}. Este difere do \textit{parser} utilizado pelos restantes no sentido em que recorre a uma biblioteca \texttt{pyasn1}, que se melhor ajusta à estrutura requerida. Como tal, o \textit{encoding} para o formato ASN1 nas funções de leitura e escrita de ficheiros é executada por estes:
 
-\begin{lstlisting}[caption=Formatação de dados para o ficheiro EF.SOD, language=Python]
+\begin{verbatim}
 def sod_encode(signed_data):
     global TAG
     return TAG + encode(signed_data).hex()
@@ -324,72 +160,14 @@ def sod_decode(hex_signed_data):
     assert rest == b'', 'ERROR: "rest" not null.'
 
     return signed_data
-\end{lstlisting}
+\end{verbatim}
 
-Para que o mDL possa gerir os as suas assinaturas, este recebe uma API appropriada que permite a geração de assinaturas digitais baseadas nos conteúdos de dados que se pretende enviar a um requerente:
+Para que o mDL possa gerir os as suas assinaturas, este recebe uma API appropriada que permite a geração de assinaturas digitais baseadas nos conteúdos de dados que se pretende enviar a um requerente. Em particular deestacam-se as funções de \textit{get} e \textit{set} de \textit{digests} e de assinaturas digitais, respetivamente:
 
-\begin{lstlisting}[caption=Gestão de digests e assinaturas no EF.SOD, language=Python]
-    def set_digests(self, groups):
-    dgh = parser.DataGroupHash()
-    for n, (id, group) in enumerate(groups.items()):
-        data = parser.Data()
-        data['dataGroupNumber'] = id
-        data['dataGroupHashValue'] = group.hash(self.signed_data['digestAlgorithm'])
-        dgh.setComponentByPosition(n, data)
-    self.signed_data['dataGroupHash'] = dgh
+\begin{itemize}
+    \item A função \texttt{get\_digests} devolve um dicionário de dados composto pelas \textit{hashes} guardadas na classe.
+    \item A função \texttt{set\_digests} permite o carregamento do conjunto de \textit{hashes} dos grupos de dados a enviar numa instância da classe para posterior escrita e/ou envio.
+    \item A função \texttt{get\_signature} devolve a assinatura digital do respetivo EF.SOD.
+    \item A função \texttt{set\_signature} é responsável por assinar os dados do EF.SOD recorrendo a um algoritmo de assinatura e a uma chave privada correspondente ao certificado, ambos armazenados no mesmo.
+\end{itemize}
 
-def get_digests(self):
-    res = {}
-    for group in self.signed_data['dataGroupHash']:
-        res[int(group['dataGroupNumber'])] = str(group['dataGroupHashValue'])
-    return res
-
-def set_signature(self, password):
-    try:
-        key = load_der_private_key(bytes(self.signed_data['signature']), password=password, backend=default_backend())
-    except ValueError:
-        print("ERROR: Bad decrypt. Incorrect password?")
-        sys.exit(1)
-
-    digest = ''.join([str(x['dataGroupHashValue']) for x in self.signed_data['dataGroupHash']])
-
-    signature = None
-
-    if self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PKCS1-v1_5-SHA256':
-        signature = key.sign(
-            digest.encode(),
-            padding.PKCS1v15(),
-            hashes.SHA256()
-        )
-    elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PSS-SHA256':
-        signature = key.sign(
-            digest.encode(),
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
-        )
-    elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PKCS1-v1_5-SHA1':
-        signature = key.sign(
-            digest.encode(),
-            padding.PKCS1v15(),
-            hashes.SHA1()
-        )
-    elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PSS-SHA1':
-        signature = key.sign(
-            digest.encode(),
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA1()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA1()
-        )
-    else:
-        print('ERROR: Signature algorithm not implemented.')
-        sys.exit(1)
-    self.signed_data['signature'] = signature
-
-def get_signature(self):
-    return self.signed_data['signature']
-\end{lstlisting}
