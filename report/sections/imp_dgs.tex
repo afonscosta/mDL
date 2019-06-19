@@ -20,7 +20,7 @@ def encode(self):
     return asn1.encode(self, './data_groups/configs/dg1.json')
 \end{Verbatim}
 
-Tanto o carregamento como a escrita destes é executada com a ajuda de um ficheiro JSON que permite alterações à estrutura da implementação sem que haja alterações no código em si. Cada um dos DG's tem o seu próprio JSON no qual são guardadas os seus campos, bem como os respetivos comprimentos em \textit{bytes} e as suas \textit{tags} e é convertido de e para o formato ASN1 consoante a sua leitura e escrita, respetivamente.
+Tanto o carregamento como a escrita destes é executada com a ajuda de um ficheiro JSON que permite alterações à estrutura da implementação sem que haja alterações no código em si. Cada um dos DG's tem o seu próprio JSON, no qual são guardados os seus campos, bem como os respetivos comprimentos em \textit{bytes} e as suas \textit{tags}. Para além disso, cada DG é convertido de e para o formato ASN1, consoante a leitura e escrita, respetivamente.
 
 \subsection{Data Groups 1, 6 e 10}
 
