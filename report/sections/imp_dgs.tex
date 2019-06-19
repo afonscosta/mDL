@@ -254,3 +254,142 @@ Como esta funciona puramente como um meio rápido de averiguar os dados disponí
 
 \subsection{EF_GroupAccess}
 
+Este ficheiro é responsável por guardar a lista de grupos aos quais um titular mDL dá permissões de leitura a um dado requerente mDL.
+
+\begin{lstlisting}[caption=Instanciação dos dados do ficheiro EF.GroupAccess, language=Python]
+    self.allowed_data_groups = {}
+    for dg, tag in data.items():
+        self.allowed_data_groups[int(dg)] = tag
+\end{lstlisting}
+
+Como este é utilizada sempre que é efetuada uma transação de dados, requer um conjunto de funções que permitam a leitura e gestão do seu conteúdo.
+
+\begin{lstlisting}[caption=API de acesso ao EF.GroupAccess, language=Python]
+    def set_permissions(self, allowed):
+    """ Estabelece os campos que têm autorização para serem lidos.
+
+    Parâmetros
+    ----------
+    allowed : dict
+        dicionário com os números dos data groups como chaves e uma lista das
+        tags cujo acesso ao conteúdo é permitido como valor
+    """
+    self.allowed_data_groups = {}
+    for dg, tag in allowed.items():
+        self.allowed_data_groups[dg] = tag
+
+def add_permissions(self, allowed):
+    """ Adiciona novos campos que têm autorização para serem lidos.
+
+    Parâmetros
+    ----------
+    allowed : dict
+        dicionário com os números dos data groups como chaves e uma lista das
+        tags cujo acesso ao conteúdo é permitido como valor
+    """
+    for dg, tag in allowed.items():
+        self.allowed_data_groups[dg] = tag
+
+def is_allowed(self, dg):
+    """ Obtém indicação se acesso a determinado data group é permitido.
+
+    Parâmetros
+    ----------
+    dg : int
+        identificador do data group
+
+    Retorna
+    -------
+    result : boolean
+        True, se existe permissão para aceder ao data group. False,
+        caso contrário.
+    """
+    return dg in self.allowed_data_groups
+\end{lstlisting}
+
+
+\subsection{Ficheiro EF.SOD}
+
+Este ficheiro é responsável por gerir os valores de \textit{hash} dos dados mDL e gerar assinaturas digitais. Este contém uma estrutura que varia significativamente dos restantes ficheiros e, como tal, contém o seu próprio \textit{parser} demoninado de \texttt{ef_sod_parser}. Como tal, o \textit{encoding} para o formato ASN1 nas funções de leitura e escrita de ficheiros é executada por estes:
+
+\begin{lstlisting}[caption=Formatação de dados para o ficheiro EF.SOD, language=Python]
+def sod_encode(signed_data):
+    global TAG
+    return TAG + encode(signed_data).hex()
+
+def sod_decode(hex_signed_data):
+    global TAG
+    assert hex_signed_data.startswith(TAG), 'ERROR: Unknown or invalid tag.'
+    signed_data, rest = decode(bytes.fromhex(hex_signed_data[2:]), asn1Spec=SignedData())
+    assert rest == b'', 'ERROR: "rest" not null.'
+
+    return signed_data
+\end{lstlisting}
+
+Para que o mDL possa gerir os as suas assinaturas, este recebe uma API appropriada que permite a geração de assinaturas digitais baseadas nos conteúdos de dados que se pretende enviar a um requerente:
+
+\begin{lstlisting}[caption=Gestão de digests e assinaturas no EF.SOD, language=Python]
+    def set_digests(self, groups):
+    dgh = parser.DataGroupHash()
+    for n, (id, group) in enumerate(groups.items()):
+        data = parser.Data()
+        data['dataGroupNumber'] = id
+        data['dataGroupHashValue'] = group.hash(self.signed_data['digestAlgorithm'])
+        dgh.setComponentByPosition(n, data)
+    self.signed_data['dataGroupHash'] = dgh
+
+def get_digests(self):
+    res = {}
+    for group in self.signed_data['dataGroupHash']:
+        res[int(group['dataGroupNumber'])] = str(group['dataGroupHashValue'])
+    return res
+
+def set_signature(self, password):
+    try:
+        key = load_der_private_key(bytes(self.signed_data['signature']), password=password, backend=default_backend())
+    except ValueError:
+        print("ERROR: Bad decrypt. Incorrect password?")
+        sys.exit(1)
+
+    digest = ''.join([str(x['dataGroupHashValue']) for x in self.signed_data['dataGroupHash']])
+
+    signature = None
+
+    if self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PKCS1-v1_5-SHA256':
+        signature = key.sign(
+            digest.encode(),
+            padding.PKCS1v15(),
+            hashes.SHA256()
+        )
+    elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PSS-SHA256':
+        signature = key.sign(
+            digest.encode(),
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+    elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PKCS1-v1_5-SHA1':
+        signature = key.sign(
+            digest.encode(),
+            padding.PKCS1v15(),
+            hashes.SHA1()
+        )
+    elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PSS-SHA1':
+        signature = key.sign(
+            digest.encode(),
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA1()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA1()
+        )
+    else:
+        print('ERROR: Signature algorithm not implemented.')
+        sys.exit(1)
+    self.signed_data['signature'] = signature
+
+def get_signature(self):
+    return self.signed_data['signature']
+\end{lstlisting}
