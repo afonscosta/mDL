@@ -3,7 +3,7 @@ from data_groups import dg6
 from data_groups import dg10
 from data_groups import ef_com
 from data_groups import ef_groupAccess
-# from data_groups import ef_sod
+from data_groups import ef_sod
 
 class mDL:
     # Mapeamento entre a tag e o número do DG
@@ -29,7 +29,13 @@ class mDL:
             self.dg10 = dg10.DG10(data['dg10'])
             self.ef_com = ef_com.EF_COM(data['ef_com'])
             self.ef_groupAccess = ef_groupAccess.EF_GroupAccess(data['ef_groupAccess'])
-            #self.ef_sod = ef_sod.EF_SOD(data['ef_sod'])
+            self.ef_sod = ef_sod.EF_SOD(data['ef_sod'])
+            self.ef_sod.set_digests({
+                1: self.dg1,
+                6: self.dg6,
+                10:self.dg10
+            })
+            self.ef_sod.set_signature()
 
     def load(self):
         """ Carrega os dados do mDL dos ficheiros respetivos, codificados com ASN1."""
@@ -40,7 +46,7 @@ class mDL:
         self.ef_groupAccess = ef_groupAccess.EF_GroupAccess(
             './data_groups/asn1_hex_data/ef_groupAccess.txt'
         )
-        #self.ef_sod = ef_sod.EF_SOD('./data_groups/asn1_hex_data/ef_sod.txt')
+        self.ef_sod = ef_sod.EF_SOD('./data_groups/asn1_hex_data/ef_sod.txt')
 
     def save(self):
         """ Guarda os dados do mDL nos ficheiros respetivos, codificados com ASN1."""
@@ -49,7 +55,7 @@ class mDL:
         self.dg10.save('./data_groups/asn1_hex_data/dg10.txt')
         self.ef_com.save('./data_groups/asn1_hex_data/ef_com.txt')
         self.ef_groupAccess.save('./data_groups/asn1_hex_data/ef_groupAccess.txt')
-        #self.ef_sod.save('./data_groups/asn1_hex_data/ef_sod.txt')
+        self.ef_sod.save('./data_groups/asn1_hex_data/ef_sod.txt')
 
     def set_permissions(self, allow):
         """ Define quais os DG's que têm permissão para serem acedidos.
@@ -147,10 +153,9 @@ class mDL:
         signature : str
             assinatura dos dados do mDL
         """
-        # return self.ef_sod.get_signature()
-        pass
+        return self.ef_sod.get_signature()
 
-    def get_digests(self, data_groups):
+    def get_digests(self):
         """ Devolve os digests dos DG's do mDL.
 
         Retorna:
@@ -159,8 +164,7 @@ class mDL:
             dicionário em que a chave é o número do DG e
             o valor é o respetivo digest
         """
-        # return self.ef_sod.get_digests()
-        pass
+        return self.ef_sod.get_digests()
 
     def get_available_data_groups(self):
         """ Devolve as tags dos DG's presentes no mDL.

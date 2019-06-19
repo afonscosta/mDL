@@ -128,7 +128,7 @@ class DG6:
         digest : str
             valor de hash
         """
-        data = "".join([t.version + t.bdb_owner + t.bdb_type + t.bdb
+        data = "".join([str(t.version) + str(t.bdb_owner) + str(t.bdb_type) + str(t.bdb)
                         for t in self.biometric_templates])
 
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())

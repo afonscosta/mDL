@@ -93,6 +93,14 @@ class mDL_transaction:
         """ Retorna os dados do mDL requeridos."""
         return self.mDL.get_data_hex(data_group_tags)
 
+    def transfer_signature(self):
+        """ Retorna a assinatura do mDL."""
+        return self.mDL.get_signature()
+
+    def transfer_digests(self):
+        """ Retorna os hashes do mDL."""
+        return self.mDL.get_digests()
+
     def print_permissions(self):
         print('DG1', self.mDL.ef_groupAccess.is_allowed(1))
         print('DG6', self.mDL.ef_groupAccess.is_allowed(6))

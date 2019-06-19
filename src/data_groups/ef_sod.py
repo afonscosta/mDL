@@ -1,17 +1,15 @@
-import sys 
-sys.path.append('../')
-import dg1 as DG1
-import dg6 as DG6
-import dg10 as DG10
-import ef_com as EF_COM
-import ef_groupAccess as EF_GroupAccess
+from data_groups import dg1 as DG1
+from data_groups import dg6 as DG6
+from data_groups import dg10 as DG10
+from data_groups import ef_com as EF_COM
+from data_groups import ef_groupAccess as EF_GroupAccess
 import re
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import load_der_private_key
-import ef_sod_parser as parser
+from data_groups import ef_sod_parser as parser
 
 class EF_SOD:
 
@@ -73,24 +71,22 @@ class EF_SOD:
     def get_digests(self):
         res = {}
         for group in self.signed_data['dataGroupHash']:
-            res[group['dataGroupNumber']] = group['dataGroupHashValue']
+            res[int(group['dataGroupNumber'])] = str(group['dataGroupHashValue'])
         return res
 
     def set_signature(self):
         # TODO: ver passphrase
-        with open("./key.der", "rb") as f:
+        with open("./certificates/key.der", "rb") as f:
             key = load_der_private_key(f.read(), password=b"passphrase", backend=default_backend())
 
-        digest = ''.join([x['dataGroupHashValue'] for x in self.signed_data['dataGroupHash']])
+        digest = ''.join([str(x['dataGroupHashValue']) for x in self.signed_data['dataGroupHash']])
 
         signature = None
 
         if self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PKCS1-v1_5-SHA256':
             signature = key.sign(
                 digest.encode(),
-                padding.PKCS1v15(
-                    mgf=padding.MGF1(hashes.SHA256())
-                ),
+                padding.PKCS1v15(),
                 hashes.SHA256()
             )
         elif self.signed_data['signatureAlgorithm'] == 'id-pk-RSA-PSS-v1_5-SHA256':
@@ -106,39 +102,39 @@ class EF_SOD:
             raise Exception('ERROR: Algorithm not implemented.')
         self.signed_data['signature'] = signature
 
-    def get_signature(self, groups):
+    def get_signature(self):
         return self.signed_data['signature']
 
 
-    def __str__(self):
-        return str(self.signed_data)
+    # def __str__(self):
+    #     return str(self.signed_data)
 
-with open('../certificates/certificate.der', 'rb') as f:
-    certificate = f.read()
+# with open('../certificates/certificate.der', 'rb') as f:
+#     certificate = f.read()
 
-data_string = 'datagrouphash'
+# data_string = 'datagrouphash'
 
-data = {
-    'digestAlgorithm': 'id-sha256',
-    'signatureAlgorithm': 'id-pk-RSA-PKCS1-v1_5-SHA256',
-    'certificate': certificate.hex(),
-    'signature': 'a231',
-    'dataGroupHash': [
-        {
-            'dataGroupNumber': 1,
-            'dataGroupHashValue': "a411"
-        },
-        {
-            'dataGroupNumber': 2,
-            'dataGroupHashValue': "ba41"
-        }
-    ]
-}
+# data = {
+#     'digestAlgorithm': 'id-sha256',
+#     'signatureAlgorithm': 'id-pk-RSA-PKCS1-v1_5-SHA256',
+#     'certificate': certificate.hex(),
+#     'signature': 'a231',
+#     'dataGroupHash': [
+#         {
+#             'dataGroupNumber': 1,
+#             'dataGroupHashValue': "a411"
+#         },
+#         {
+#             'dataGroupNumber': 2,
+#             'dataGroupHashValue': "ba41"
+#         }
+#     ]
+# }
 
-ef_sod = EF_SOD(data)
+# ef_sod = EF_SOD(data)
 
-ef_sod.save('ef_sod.txt')
+# ef_sod.save('ef_sod.txt')
 
-data1 = ef_sod.load('ef_sod.txt')
+# data1 = ef_sod.load('ef_sod.txt')
 
-print(EF_SOD(data1))
+# print(EF_SOD(data1))
