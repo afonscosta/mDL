@@ -112,7 +112,6 @@ digest10 = transfer_sod_data['dataGroupHash'][2]['dataGroupHashValue']
 print('DIGESTS VALIDATION:',
         transfer_digests[1] == digest1 and\
         transfer_digests[10] == digest10)
-
 print('SIGNATURE VALIDATION:',
     verify_signature(
         sod_digests,
