@@ -37,4 +37,4 @@ def verify_cert(cert_der, cn):
 with open("./certificate.der", "rb") as f:
     cert_der = f.read()
 
-verify_cert(cert_der, u"mysite1.com")
+verify_cert(cert_der, u"IA")

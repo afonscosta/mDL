@@ -24,11 +24,11 @@ with open("./key.der", "wb") as f:
 # Generate a CSR
 csr = x509.CertificateSigningRequestBuilder().subject_name(x509.Name([
     # Provide various details about who we are.
-    x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
-    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
-    x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
-    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"My Company"),
-    x509.NameAttribute(NameOID.COMMON_NAME, u"mysite1.com"),
+    x509.NameAttribute(NameOID.COUNTRY_NAME, u"PT"),
+    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Braga"),
+    x509.NameAttribute(NameOID.LOCALITY_NAME, u"Gualtar"),
+    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"UMinho"),
+    x509.NameAttribute(NameOID.COMMON_NAME, u"IA"),
 ])).add_extension(
     x509.SubjectAlternativeName([
         # Describe what sites we want this certificate for.

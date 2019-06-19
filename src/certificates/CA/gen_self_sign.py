@@ -23,11 +23,11 @@ with open("key_self_sign.der", "wb") as f:
 # Various details about who we are. For a self-signed certificate the
 # subject and issuer are always the same.
 subject = issuer = x509.Name([
-    x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
-    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
-    x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
-    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"My Company"),
-    x509.NameAttribute(NameOID.COMMON_NAME, u"mysite.com"),
+    x509.NameAttribute(NameOID.COUNTRY_NAME, u"PT"),
+    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Braga"),
+    x509.NameAttribute(NameOID.LOCALITY_NAME, u"Gualtar"),
+    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"UMinho"),
+    x509.NameAttribute(NameOID.COMMON_NAME, u"CA"),
 ])
 cert = x509.CertificateBuilder().subject_name(
     subject

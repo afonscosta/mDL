@@ -18,11 +18,11 @@ with open("../csr.der", "rb") as f:
     csr = x509.load_der_x509_csr(f.read(), default_backend())
 
 subject = issuer = x509.Name([
-    x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
-    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"California"),
-    x509.NameAttribute(NameOID.LOCALITY_NAME, u"San Francisco"),
-    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"My Company"),
-    x509.NameAttribute(NameOID.COMMON_NAME, u"mysite.com"),
+    x509.NameAttribute(NameOID.COUNTRY_NAME, u"PT"),
+    x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Braga"),
+    x509.NameAttribute(NameOID.LOCALITY_NAME, u"Gualtar"),
+    x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"UMinho"),
+    x509.NameAttribute(NameOID.COMMON_NAME, u"CA"),
 ])
 
 cert = x509.CertificateBuilder().subject_name(
