@@ -148,6 +148,7 @@ class DG1:
         data['issuing_country'] = self.issuing_country
         data['issuing_authority'] = self.issuing_authority
         data['license_number'] = self.license_number
+        data['number_of_entries'] = self.number_of_entries
         data['categories_of_vehicles'] = self.categories_of_vehicles
         return data
 

@@ -91,7 +91,7 @@ class mDL_transaction:
 
     def transfer_data(self, data_group_tags):
         """ Retorna os dados do mDL requeridos."""
-        return self.mDL.get_data_hex(data_group_tags)
+        return self.mDL.get_data(data_group_tags) #self.mDL.get_data_hex(data_group_tags)
 
     def transfer_signature(self):
         """ Retorna a assinatura do mDL."""

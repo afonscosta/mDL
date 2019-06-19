@@ -64,7 +64,6 @@ class EF_SOD:
             data = parser.Data()
             data['dataGroupNumber'] = id
             data['dataGroupHashValue'] = group.hash(self.signed_data['digestAlgorithm'])
-            # TODO: Passar digestAlgorithm ao hash
             dgh.setComponentByPosition(n, data)
         self.signed_data['dataGroupHash'] = dgh
 
