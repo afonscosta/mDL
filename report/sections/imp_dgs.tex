@@ -5,7 +5,7 @@
 
 Para cada um dos ficheiros que compõe a estrutura de dados, foi implementada uma \textit{script} com um conjunto de funcionalidades que as permitem criar e gerir os respetivos ficheiros. Estes são depois acedidos pelo \textit{mDL} através da sua API, da qual as \textit{scripts} partilham a capacidade de carregar e escrever os dados do respetivo grupo de dados em ficheiro, bem como codificar o seu conteúdo	para o formato ASN1:
 
-\begin{verbatim}[language=Python, caption=Exemplos de funções de inicialização\, escrita e carregamento de dados no DG1]
+\begin{verbatim}
 def save(self, filename):
     with open(filename, 'w+') as fp:
         hex_data = asn1.encode(self, './data_groups/configs/dg1.json')
@@ -24,14 +24,14 @@ Tanto o carregamento como a escrita destes é executada com a ajuda de um fichei
 
 \subsection{Data Groups 1, 6 e 10}
 
-Estes DG's são responsáveis por armazenar os dados do titular mDL, bem como os do próprio título mDL. Cada um destes contem um conjunto de funções que as permitem demonstrar o seu conteúdo conforme necessário. Cada um destes tem a sua implementação específica, ainda assim, seguem uma estrutura idêntica. Em particular, a função \texttt{get_data} preenche e devolve um dicionário com todos os valores do respetivo grupo de dados e a função \texttt{__str__} devolve o conteúdo do mesmo sob a forma de uma \textit{string}. Por fim, é implementada uma função de \textit{hash} que suporta um conjunto de diferentes algoritmos de acordo com o \textit{standard} do mDL, entre os quais, o SHA-1, SHA-224, SHA-256 e SHA-512.
+Estes DG's são responsáveis por armazenar os dados do titular mDL, bem como os do próprio título mDL. Cada um destes contem um conjunto de funções que as permitem demonstrar o seu conteúdo conforme necessário. Cada um destes tem a sua implementação específica, ainda assim, seguem uma estrutura idêntica. Em particular, a função \texttt{get\_data} preenche e devolve um dicionário com todos os valores do respetivo grupo de dados e a função \texttt{\_\_str\_\_} devolve o conteúdo do mesmo sob a forma de uma \textit{string}. Por fim, é implementada uma função de \textit{hash} que suporta um conjunto de diferentes algoritmos de acordo com o \textit{standard} do mDL, entre os quais, o SHA-1, SHA-224, SHA-256 e SHA-512.
 
 
 \subsubsection{Data Group 1}
 
 Este DG é responsável por armazenar os dados do titular mDL, bem como alguma informação básica do próprio título mDL. Cada um destes contém um conjunto de variáveis de instância correspondentes aos respetivos dados explicitados na estrutura de dados:
 
-\begin{verbatim}[caption=Instanciação das variáveis do DG1, language=Python]
+\begin{verbatim}
 def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
@@ -51,7 +51,7 @@ def __init__(self, data):
 
 Este DG contém um conjunto de dados biométricos relativos ao titular, em particular, a sua foto. Para permitir uma melhor gestão deste ficheiro, foi criada uma classe auxiliar \texttt{BiometricTemplate}:
 
-\begin{verbatim}[caption=Instanciação dos dados do DG6, recorrendo à classe auxiliar, language=Python]
+\begin{verbatim}
 class BiometricTemplate:
     def __init__(self, version, bdb_owner, bdb_type, bdb):
         self.version = version if version is not None else '0101'
@@ -87,7 +87,7 @@ Nesta classe auxiliar, é guardado um único tipo de identificador biométrico, 
 
 Este grupo de dados é responsável por armazenar os dados relativos à gestão do mDL, incluindo a sua data de validade e as datas do último e próximo \textit{updates}. 
 
-\begin{verbatim}[caption=Instanciação dos dados do DG10, language=Python]
+\begin{verbatim}
     def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
@@ -98,11 +98,11 @@ Este grupo de dados é responsável por armazenar os dados relativos à gestão 
     self.management_info = data['management_info']
 \end{verbatim}
 
-\subsection{EF_COM}
+\subsection{EF.COM}
 
 O ficheiro elementar COM é responsável por armazenar as \textit{tags} relativas aos grupos de dados presentes numa dada implementação do mDL.
 
-\begin{verbatim}[caption=Instanciação de variáveis no EF.COM, language=Python]
+\begin{verbatim}
 def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
@@ -113,11 +113,11 @@ def __init__(self, data):
 Como esta funciona puramente como um meio rápido de averiguar os dados disponíveis ao mDL, este contém apenas as funções de API básica, bem como uma função de exibição de dados semelhante aos grupos de dados anteriormente expostos.
 
 
-\subsection{EF_GroupAccess}
+\subsection{EF.GroupAccess}
 
 Este ficheiro é responsável por guardar a lista de grupos aos quais um titular mDL dá permissões de leitura a um dado requerente mDL.
 
-\begin{verbatim}[caption=Instanciação dos dados do ficheiro EF.GroupAccess, language=Python]
+\begin{verbatim}
 def __init__(self, data):
     if isinstance(data, str):
         self.allowed_data_groups = self.load(data)['allowed_data_groups']
@@ -129,7 +129,7 @@ def __init__(self, data):
 
 Como este é utilizada sempre que é efetuada uma transação de dados, requer um conjunto de funções que permitam a leitura e gestão do seu conteúdo.
 
-\begin{verbatim}[caption=API de acesso ao EF.GroupAccess, language=Python]
+\begin{verbatim}
 def set_permissions(self, allowed):
     self.allowed_data_groups = {}
     for dg, tag in allowed.items():
@@ -146,9 +146,9 @@ def is_allowed(self, dg):
 
 \subsection{Ficheiro EF.SOD}
 
-Este ficheiro é responsável por gerir os valores de \textit{hash} dos dados mDL e gerar assinaturas digitais. Este contém uma estrutura que varia significativamente dos restantes ficheiros e, como tal, contém o seu próprio \textit{parser} demoninado de \texttt{ef_sod_parser}. Como tal, o \textit{encoding} para o formato ASN1 nas funções de leitura e escrita de ficheiros é executada por estes:
+Este ficheiro é responsável por gerir os valores de \textit{hash} dos dados mDL e gerar assinaturas digitais. Este contém uma estrutura que varia significativamente dos restantes ficheiros e, como tal, contém o seu próprio \textit{parser} denominado de \texttt{ef\_sod\_parser}. Este difere do \textit{parser} utilizado pelos restantes no sentido em que recorre a uma biblioteca \texttt{pyasn1}, que se melhor ajusta à estrutura requerida. Como tal, o \textit{encoding} para o formato ASN1 nas funções de leitura e escrita de ficheiros é executada por estes:
 
-\begin{verbatim}[caption=Formatação de dados para o ficheiro EF.SOD, language=Python]
+\begin{verbatim}
 def sod_encode(signed_data):
     global TAG
     return TAG + encode(signed_data).hex()
@@ -165,9 +165,9 @@ def sod_decode(hex_signed_data):
 Para que o mDL possa gerir os as suas assinaturas, este recebe uma API appropriada que permite a geração de assinaturas digitais baseadas nos conteúdos de dados que se pretende enviar a um requerente. Em particular deestacam-se as funções de \textit{get} e \textit{set} de \textit{digests} e de assinaturas digitais, respetivamente:
 
 \begin{itemize}
-    \item A função \texttt{get_digests} devolve um dicionário de dados composto pelas \textit{hashes} guardadas na classe.
-    \item A função \texttt{set_digests} permite o carregamento do conjunto de \textit{hashes} dos grupos de dados a enviar numa instância da classe para posterior escrita e/ou envio.
-    \item A função \texttt{get_signature} devolve a assinatura digital do respetivo EF.SOD.
-    \item A função \texttt{set_signature} é responsável por assinar os dados do EF.SOD recorrendo a um algoritmo de assinatura e a uma chave privada correspondente ao certificado, ambos armazenados no mesmo.
+    \item A função \texttt{get\_digests} devolve um dicionário de dados composto pelas \textit{hashes} guardadas na classe.
+    \item A função \texttt{set\_digests} permite o carregamento do conjunto de \textit{hashes} dos grupos de dados a enviar numa instância da classe para posterior escrita e/ou envio.
+    \item A função \texttt{get\_signature} devolve a assinatura digital do respetivo EF.SOD.
+    \item A função \texttt{set\_signature} é responsável por assinar os dados do EF.SOD recorrendo a um algoritmo de assinatura e a uma chave privada correspondente ao certificado, ambos armazenados no mesmo.
 \end{itemize}
 
