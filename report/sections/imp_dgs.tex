@@ -5,7 +5,7 @@
 
 Para cada um dos ficheiros que compõe a estrutura de dados, foi implementada uma \textit{script} com um conjunto de funcionalidades que as permitem criar e gerir os respetivos ficheiros. Estes são depois acedidos pelo \textit{mDL} através da sua API, da qual as \textit{scripts} partilham a capacidade de carregar e escrever os dados do respetivo grupo de dados em ficheiro, bem como codificar o seu conteúdo	para o formato ASN1:
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 def save(self, filename):
     with open(filename, 'w+') as fp:
         hex_data = asn1.encode(self, './data_groups/configs/dg1.json')
@@ -18,7 +18,7 @@ def load(self, filename):
 
 def encode(self):
     return asn1.encode(self, './data_groups/configs/dg1.json')
-\end{verbatim}
+\end{Verbatim}
 
 Tanto o carregamento como a escrita destes é executada com a ajuda de um ficheiro JSON que permite alterações à estrutura da implementação sem que haja alterações no código em si. Cada um dos DG's tem o seu próprio JSON no qual são guardadas os seus campos, bem como os respetivos comprimentos em \textit{bytes} e as suas \textit{tags} e é convertido de e para o formato ASN1 consoante a sua leitura e escrita, respetivamente.
 
@@ -31,7 +31,7 @@ Estes DG's são responsáveis por armazenar os dados do titular mDL, bem como os
 
 Este DG é responsável por armazenar os dados do titular mDL, bem como alguma informação básica do próprio título mDL. Cada um destes contém um conjunto de variáveis de instância correspondentes aos respetivos dados explicitados na estrutura de dados:
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
@@ -45,13 +45,13 @@ def __init__(self, data):
     self.license_number = data['license_number']
     self.number_of_entries = data['number_of_entries']
     self.categories_of_vehicles = data['categories_of_vehicles']
-\end{verbatim}
+\end{Verbatim}
 
 \subsubsection{Data Group 6}
 
 Este DG contém um conjunto de dados biométricos relativos ao titular, em particular, a sua foto. Para permitir uma melhor gestão deste ficheiro, foi criada uma classe auxiliar \texttt{BiometricTemplate}:
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 class BiometricTemplate:
     def __init__(self, version, bdb_owner, bdb_type, bdb):
         self.version = version if version is not None else '0101'
@@ -60,7 +60,12 @@ class BiometricTemplate:
         self.bdb = bdb
     
     def __str__(self):
-        return '(' + ', '.join([str(self.version), str(self.bdb_owner), str(self.bdb_type), str(self.bdb)[:20] + '...']) + ')'
+        return '(' + ', '.join([
+            str(self.version),
+            str(self.bdb_owner),
+            str(self.bdb_type),
+            str(self.bdb)[:20] + '...'
+        ]) + ')'
 
 
 class DG6:
@@ -79,7 +84,7 @@ class DG6:
                 )
             )
         self.number_of_entries = data['number_of_entries']
-\end{verbatim}
+\end{Verbatim}
 
 Nesta classe auxiliar, é guardado um único tipo de identificador biométrico, quer seja uma foto, impressão digital, entre outros. Como tal, o DG6 trata-se de um conjunto destes.
 
@@ -87,7 +92,7 @@ Nesta classe auxiliar, é guardado um único tipo de identificador biométrico, 
 
 Este grupo de dados é responsável por armazenar os dados relativos à gestão do mDL, incluindo a sua data de validade e as datas do último e próximo \textit{updates}. 
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
     def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
@@ -96,19 +101,19 @@ Este grupo de dados é responsável por armazenar os dados relativos à gestão 
     self.expiration_date = data['expiration_date']
     self.next_update = data['next_update']
     self.management_info = data['management_info']
-\end{verbatim}
+\end{Verbatim}
 
 \subsection{EF.COM}
 
 O ficheiro elementar COM é responsável por armazenar as \textit{tags} relativas aos grupos de dados presentes numa dada implementação do mDL.
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 def __init__(self, data):
     if isinstance(data, str):
         data = self.load(data)
     self.version = data['version']
     self.tag_list = data['tag_list']
-\end{verbatim}
+\end{Verbatim}
 
 Como esta funciona puramente como um meio rápido de averiguar os dados disponíveis ao mDL, este contém apenas as funções de API básica, bem como uma função de exibição de dados semelhante aos grupos de dados anteriormente expostos.
 
@@ -117,7 +122,7 @@ Como esta funciona puramente como um meio rápido de averiguar os dados disponí
 
 Este ficheiro é responsável por guardar a lista de grupos aos quais um titular mDL dá permissões de leitura a um dado requerente mDL.
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 def __init__(self, data):
     if isinstance(data, str):
         self.allowed_data_groups = self.load(data)['allowed_data_groups']
@@ -125,11 +130,11 @@ def __init__(self, data):
         self.allowed_data_groups = {}
         for dg, tag in data.items():
             self.allowed_data_groups[int(dg)] = tag
-\end{verbatim}
+\end{Verbatim}
 
 Como este é utilizada sempre que é efetuada uma transação de dados, requer um conjunto de funções que permitam a leitura e gestão do seu conteúdo.
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 def set_permissions(self, allowed):
     self.allowed_data_groups = {}
     for dg, tag in allowed.items():
@@ -141,14 +146,14 @@ def add_permissions(self, allowed):
 
 def is_allowed(self, dg):
     return dg in self.allowed_data_groups
-\end{verbatim}
+\end{Verbatim}
 
 
-\subsection{Ficheiro EF.SOD}
+\subsection{EF.SOD}
 
 Este ficheiro é responsável por gerir os valores de \textit{hash} dos dados mDL e gerar assinaturas digitais. Este contém uma estrutura que varia significativamente dos restantes ficheiros e, como tal, contém o seu próprio \textit{parser} denominado de \texttt{ef\_sod\_parser}. Este difere do \textit{parser} utilizado pelos restantes no sentido em que recorre a uma biblioteca \texttt{pyasn1}, que se melhor ajusta à estrutura requerida. Como tal, o \textit{encoding} para o formato ASN1 nas funções de leitura e escrita de ficheiros é executada por estes:
 
-\begin{verbatim}
+\begin{Verbatim}[frame=single, framerule=0.5mm]
 def sod_encode(signed_data):
     global TAG
     return TAG + encode(signed_data).hex()
@@ -156,11 +161,12 @@ def sod_encode(signed_data):
 def sod_decode(hex_signed_data):
     global TAG
     assert hex_signed_data.startswith(TAG), 'ERROR: Unknown or invalid tag.'
-    signed_data, rest = decode(bytes.fromhex(hex_signed_data[2:]), asn1Spec=SignedData())
+    signed_data, rest = decode(bytes.fromhex(hex_signed_data[2:]),
+                                asn1Spec=SignedData())
     assert rest == b'', 'ERROR: "rest" not null.'
 
     return signed_data
-\end{verbatim}
+\end{Verbatim}
 
 Para que o mDL possa gerir os as suas assinaturas, este recebe uma API appropriada que permite a geração de assinaturas digitais baseadas nos conteúdos de dados que se pretende enviar a um requerente. Em particular deestacam-se as funções de \textit{get} e \textit{set} de \textit{digests} e de assinaturas digitais, respetivamente:
 
