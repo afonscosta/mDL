@@ -1,6 +1,11 @@
 from pyasn1.type.univ import Integer, Sequence, OctetString, SequenceOf
 from pyasn1.type.namedtype import NamedType, NamedTypes
 from pyasn1.type.char import UniversalString
+from pyasn1.codec.der.encoder import encode
+from pyasn1.codec.der.decoder import decode
+from pyasn1.codec.native.decoder import decode as json_decode
+
+TAG = '77'
 
 class Data(Sequence):
     componentType = NamedTypes(
@@ -11,7 +16,7 @@ class Data(Sequence):
 class DataGroupHash(SequenceOf):
     componentType = Data()
 
-class Record(Sequence):
+class SignedData(Sequence):
     componentType = NamedTypes(
         NamedType('digestAlgorithm', UniversalString()),
         NamedType('signatureAlgorithm', UniversalString()),
@@ -20,20 +25,17 @@ class Record(Sequence):
         NamedType('dataGroupHash', DataGroupHash())
     )
 
-record = Record()
-record['digestAlgorithm'] = 'id-sha256'
-record['signatureAlgorithm'] = 'id-pk-RSA-PKCS1-v1_5-SHA256'
-record['certificate'] = b'43a541'
-record['signature'] = b'468a4b'
-data1 = Data()
-data1['dataGroupNumber'] = 1
-data1['dataGroupHashValue'] = b'11111'
-data2 = Data()
-data2['dataGroupNumber'] = 2
-data2['dataGroupHashValue'] = b'22222'
-dataGroupHash = DataGroupHash()
-dataGroupHash.setComponentByPosition(0, data1)
-dataGroupHash.setComponentByPosition(1, data2)
-record['dataGroupHash'] = dataGroupHash
+def create_signed_data(data):
+    return json_decode(data, asn1Spec=SignedData())
 
-print(record)
+def sod_encode(signed_data):
+    global TAG
+    return TAG + encode(signed_data).hex()
+
+def sod_decode(hex_signed_data):
+    global TAG
+    assert hex_signed_data.startswith(TAG), 'ERROR: Unknown or invalid tag.'
+    signed_data, rest = decode(bytes.fromhex(hex_signed_data[2:]), asn1Spec=SignedData())
+    assert rest == b'', 'ERROR: "rest" not null.'
+
+    return signed_data
