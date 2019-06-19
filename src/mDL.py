@@ -151,27 +151,6 @@ class mDL:
                 hex_data += self.get_dg(num_dg).encode()
         return hex_data
 
-    def get_signature(self):
-        """ Devolve a assinatura dos dados do mDL.
-
-        Retorna:
-        --------
-        signature : str
-            assinatura dos dados do mDL
-        """
-        return self.ef_sod.get_signature()
-
-    def get_digests(self):
-        """ Devolve os digests dos DG's do mDL.
-
-        Retorna:
-        --------
-        digests : dict
-            dicionário em que a chave é o número do DG e
-            o valor é o respetivo digest
-        """
-        return self.ef_sod.get_digests()
-
     def get_available_data_groups(self):
         """ Devolve as tags dos DG's presentes no mDL.
 
