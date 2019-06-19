@@ -1,6 +1,7 @@
 import asn1_parser as asn1
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
+import sys
 
 class BiometricTemplate:
     def __init__(self, version, bdb_owner, bdb_type, bdb):
@@ -99,15 +100,16 @@ class DG6:
             dicionário com os nomes das variáveis de instância como
             chaves e respetivo conteúdo como valor
         """
-        data = []
+        data = {}
+        data['number_of_entries'] = self.number_of_entries
+        data['biometric_templates'] = []
         for t in self.biometric_templates:
-            print('before')
-            print(t)
-            print('after')
-            data.append({'version': t.version,
-                         'bdb_owner': t.bdb_owner,
-                         'bdb_type': t.bdb_type,
-                         'bdb': t.bdb})
+            data['biometric_templates'].append({
+                'version': t.version,
+                'bdb_owner': t.bdb_owner,
+                'bdb_type': t.bdb_type,
+                'bdb': t.bdb
+            })
         return data
         
     def encode(self):
@@ -132,8 +134,26 @@ class DG6:
         data = "".join([str(t.version) + str(t.bdb_owner) + str(t.bdb_type) + str(t.bdb)
                         for t in self.biometric_templates])
 
-        if oid == 'id-sha256':
+        if oid == 'id-sha1':
+            digest = hashes.Hash(hashes.SHA1(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        elif oid == 'id-sha224':
+            digest = hashes.Hash(hashes.SHA224(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        elif oid == 'id-sha256':
             digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
             digest.update(data.encode())
             return digest.finalize()
-        else: raise Exception('ERROR: Hash algorithm not implemented.')
+        elif oid == 'id-sha384':
+            digest = hashes.Hash(hashes.SHA384(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        elif oid == 'id-sha512':
+            digest = hashes.Hash(hashes.SHA512(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        else:
+            print('ERROR: Hash algorithm not implemented.')
+            sys.exit(1)

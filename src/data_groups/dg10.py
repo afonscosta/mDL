@@ -1,6 +1,7 @@
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 import asn1_parser as asn1
+import sys
 
 class DG10:
     """
@@ -117,8 +118,26 @@ class DG10:
             self.next_update,
             self.management_info
         ])
-        if oid == 'id-sha256':
+        if oid == 'id-sha1':
+            digest = hashes.Hash(hashes.SHA1(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        elif oid == 'id-sha224':
+            digest = hashes.Hash(hashes.SHA224(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        elif oid == 'id-sha256':
             digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
             digest.update(data.encode())
             return digest.finalize()
-        else: raise Exception('ERROR: Hash algorithm not implemented.')
+        elif oid == 'id-sha384':
+            digest = hashes.Hash(hashes.SHA384(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        elif oid == 'id-sha512':
+            digest = hashes.Hash(hashes.SHA512(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        else:
+            print('ERROR: Hash algorithm not implemented.')
+            sys.exit(1)

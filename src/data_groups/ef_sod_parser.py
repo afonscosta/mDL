@@ -4,6 +4,7 @@ from pyasn1.type.char import UniversalString
 from pyasn1.codec.der.encoder import encode
 from pyasn1.codec.der.decoder import decode
 from pyasn1.codec.native.decoder import decode as json_decode
+from pyasn1.codec.native.encoder import encode as json_encode
 
 TAG = '77'
 
@@ -39,3 +40,6 @@ def sod_decode(hex_signed_data):
     assert rest == b'', 'ERROR: "rest" not null.'
 
     return signed_data
+
+def dump_json(signed_data):
+    return json_encode(signed_data)

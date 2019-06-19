@@ -29,7 +29,7 @@
                 "bdb": "picture.jpg"
             }
         ],
-        "number_of_entries": 1
+        "number_of_entries": 2
     },
     "dg10": {
         "version": "1",
@@ -47,19 +47,9 @@
     },
     "ef_sod": {
         "digestAlgorithm": "id-sha256",
-        "signatureAlgorithm": "id-pk-RSA-PKCS1-v1_5-SHA256",
-        "certificate": "43a541",
-        "signature": "468a4b",
-        "dataGroupHash": [
-            {
-                "dataGroupNumber": 1,
-                "dataGroupHashValue": "11111"
-            },
-            {
-                "dataGroupNumber": 2,
-                "dataGroupHashValue": "22222"
-            }
-        ]
+        "signatureAlgorithm": "id-pk-RSA-PSS-SHA256",
+        "certificate": "certificates/certificate.der",
+        "signature": "certificates/key.der"
     }
 }
 

@@ -2,6 +2,7 @@ import json
 import bcd
 import re
 import inspect
+import sys
 
 hex_to_char = lambda hex_code: re.escape(chr(int(hex_code,16)))
 regex_between = lambda hex_code_1, hex_code_2: \
@@ -147,7 +148,8 @@ def length(data_hex):
     elif n >= 256 and n <= 65535:
         return '10000010' + '{0:016b}'.format(n)
     else:
-        raise Exception("ERROR: Data too long.")
+        print("ERROR: Data too long.")
+        sys.exit(1)
 
 
 def extract_length(hex_text):
@@ -190,7 +192,8 @@ def extract_length(hex_text):
     elif int(bin_text[1:8], 2) == 2:
         return int(bin_text[8:24], 2), hex_text[6:]
     else:
-        raise Exception("ERROR: No length found.")
+        print("ERROR: No length found.")
+        sys.exit(1)
 
 
 def fill_length(hex_data, fixed_length_bytes):
@@ -229,7 +232,8 @@ def data_to_hex(data, encode, length = None):
         elif isinstance(data, int):
             content = bin_to_hex(bcd.int_to_bcd(data))
         else:
-            raise Exception('ERROR: Data format unknown.')
+            print('ERROR: Data format unknown.')
+            sys.exit(1)
     
     # Sem codificação
     elif encode and encode.upper() == 'NO_ENCODE':
@@ -238,7 +242,8 @@ def data_to_hex(data, encode, length = None):
         elif isinstance(data, int):
             content = str(data)
         else:
-            raise Exception('ERROR: Data format unknown.')
+            print('ERROR: Data format unknown.')
+            sys.exit(1)
     
     # Codificação das categorias
     elif encode and encode.upper() == 'CATEGORIES_ENCODE':
@@ -253,7 +258,8 @@ def data_to_hex(data, encode, length = None):
                       fields[4].encode('latin-1').hex() + splitter +\
                       fields[5]
         except:
-            raise Exception('ERROR: Wrong categories format.')
+            print('ERROR: Wrong categories format.')
+            sys.exit(1)
     
     # Codificação dos data groups e respetivas tags
     elif encode and encode.upper() == 'DG_TAGS_ENCODE':
@@ -263,13 +269,16 @@ def data_to_hex(data, encode, length = None):
                 dg_hex = int_to_hex(dg).upper()
 
                 if dg_hex not in DG_TAGS:
-                    raise Exception('ERROR: Wrong data group detected.')
+                    print('ERROR: Wrong data group detected.')
+                    sys.exit(1)
                 tag = tag.upper()
                 if tag != DG_TAGS[dg_hex]:
-                    raise Exception('ERROR: Wrong tag detected.')
+                    print('ERROR: Wrong tag detected.')
+                    sys.exit(1)
                 content += dg_hex + tag
         except:
-            raise Exception('ERROR: Wrong data group or tags format.')
+            print('ERROR: Wrong data group or tags format.')
+            sys.exit(1)
 
     # Codificação das lista de tags dos data groups (EF.COM)
     elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
@@ -278,17 +287,20 @@ def data_to_hex(data, encode, length = None):
             all_tags = list(DG_TAGS.values())
             for tag in data:
                 if tag.upper() not in all_tags:
-                    raise Exception('ERROR: Wrong tag detected.')
+                    print('ERROR: Wrong tag detected.')
+                    sys.exit(1)
                 content += tag
         except:
-            raise Exception('ERROR: Wrong data group or tags format.')
+            print('ERROR: Wrong data group or tags format.')
+            sys.exit(1)
 
     # Codificação dos Biometric Data Block
     elif encode and encode.upper() == 'BDB_ENCODE':
         try:
             content = data.hex()
         except:
-            raise Exception('ERROR: Wrong BDB format.')
+            print('ERROR: Wrong BDB format.')
+            sys.exit(1)
     
     # Codificação da versão para o EF.COM
     elif encode and encode.upper() == 'VERSION_ENCODE':
@@ -297,7 +309,8 @@ def data_to_hex(data, encode, length = None):
             content += int_to_hex(int(data[:2]))
             content += int_to_hex(int(data[2:]))
         except:
-            raise Exception('ERROR: Wrong data group or tags format.')
+            print('ERROR: Wrong data group or tags format.')
+            sys.exit(1)
 
     # Codificação por defeito
     else:
@@ -306,7 +319,8 @@ def data_to_hex(data, encode, length = None):
         elif isinstance(data, int):
             content = int_to_hex(data)
         else:
-            raise Exception('ERROR: Data format unknown.')
+            print('ERROR: Data format unknown.')
+            sys.exit(1)
 
     if length is not None and isinstance(length, int):
         content = fill_length(content, length)
@@ -368,7 +382,8 @@ def hex_to_data(hex_data, encode, decode):
                       bytes.fromhex(hex_fields[4]).decode('latin-1') + ';' +\
                       hex_fields[5]
         except:
-            raise Exception('ERROR: Wrong categories format.')
+            print('ERROR: Wrong categories format.')
+            sys.exit(1)
     
     # Codificação dos data groups e respetivas tags
     elif encode and encode.upper() == 'DG_TAGS_ENCODE':
@@ -386,11 +401,14 @@ def hex_to_data(hex_data, encode, decode):
                         content[dg] = DG_TAGS[dg_hex]
                         hex_data = hex_data[2:]
                     else:
-                        raise Exception('ERROR: Wrong tag detected.')
+                        print('ERROR: Wrong tag detected.')
+                        sys.exit(1)
                 else:
-                    raise Exception('ERROR: Wrong data group detected.')
+                    print('ERROR: Wrong data group detected.')
+                    sys.exit(1)
         except:
-            raise Exception('ERROR: Wrong data group or tags format.')
+            print('ERROR: Wrong data group or tags format.')
+            sys.exit(1)
 
     # Codificação dos data groups e respetivas tags (EF.COM)
     elif encode and encode.upper() == 'DG_TAGS_LIST_ENCODE':
@@ -402,18 +420,21 @@ def hex_to_data(hex_data, encode, decode):
             for j in range(2, len(hex_data)+1, 2):
                 tag = hex_data[i:j]
                 if not tag in all_tags:
-                    raise Exception('ERROR: Wrong tag detected.')
+                    print('ERROR: Wrong tag detected.')
+                    sys.exit(1)
                 content.append(tag)
                 i = j
         except:
-            raise Exception('ERROR: Wrong data group or tags format.')
+            print('ERROR: Wrong data group or tags format.')
+            sys.exit(1)
 
     # Codificação dos Biometric Data Block
     elif encode and encode.upper() == 'BDB_ENCODE':
         try:
             content = bytes.fromhex(hex_data)
         except:
-            raise Exception('ERROR: Wrong BDB format.')
+            print('ERROR: Wrong BDB format.')
+            sys.exit(1)
     
     # Codificação da versão para o EF.COM
     elif encode and encode.upper() == 'VERSION_ENCODE':
@@ -422,7 +443,8 @@ def hex_to_data(hex_data, encode, decode):
             content += f"{hex_to_int(hex_data[:2]):02d}"
             content += f"{hex_to_int(hex_data[2:]):02d}"
         except:
-            raise Exception('ERROR: Wrong version format.')
+            print('ERROR: Wrong version format.')
+            sys.exit(1)
 
     # Codificação por defeito
     else:
@@ -508,7 +530,8 @@ def tlv_to_data(hex_string, config):
         if hex_string.lower().startswith(config['tag'].lower()):
             hex_string = hex_string[len(config['tag']):]
         else:
-            raise Exception('ERROR: Unexpected tag.')
+            print('ERROR: Unexpected tag.')
+            sys.exit(1)
     # Remover Length
     if 'length' in config:
         if config['length'] == 'var':
@@ -584,12 +607,14 @@ def validate_constraints(data, config, last_key):
                         + r'$',
                         str(data),
                         flags=re.UNICODE):
-            raise Exception(f'ERROR: Field {last_key} cannot take the value "{data}".')
+            print(f'ERROR: Field {last_key} cannot take the value "{data}".')
+            sys.exit(1)
     
     # Valida restrição com funções
     if 'constraints_func' in config:
         if not eval(config['constraints_func'].replace('$DATA', f'"{data}"')):
-            raise Exception(f'ERROR: Field {last_key} cannot take the value "{data}".')
+            print(f'ERROR: Field {last_key} cannot take the value "{data}".')
+            sys.exit(1)
 
 
 def asn1_encode(data_group, config, last_key = None):
@@ -629,14 +654,15 @@ def asn1_encode(data_group, config, last_key = None):
         elif isinstance(data_group, dict):
             data = data_group[last_key]
         else: 
-            print('HERE ' + str(config))
-            raise Exception('ERROR: Data provider must be a class or dict and must obey configuration.')
+            print('ERROR: Data provider must be a class or dict and must obey configuration.')
+            sys.exit(1)
     
     # Se é lista, valida restrições e codifica cada elemento da variável
     if 'size_list' in config:
         if config['size_list'] and hasattr(data_group, config['size_list']) and \
                 getattr(data_group, config['size_list']) != len(data):
-            raise Exception('ERROR: Provided list length differs from actual length.')
+            print('ERROR: Provided list length differs from actual length.')
+            sys.exit(1)
         
         if 'compost_content' in config:
             for elem in data:
@@ -712,7 +738,8 @@ def asn1_decode(hex_string, config, last_key = None):
             data.update(data_tmp)
         # Se sobrar conteúdo, codificação está incorreta
         if hex_content:
-            raise Exception('ERROR: Data length is higher than expected.')
+            print('ERROR: Data length is higher than expected.')
+            sys.exit(1)
     # Se não, descodifica a variável, valida-a e adiciona-a aos dados
     else:
         if 'size_list' in config:
@@ -721,7 +748,8 @@ def asn1_decode(hex_string, config, last_key = None):
                     data_tmp, rest_temp = asn1_decode(hex_elem, {'content': config['compost_content']}, last_key)
                     # Se sobrar conteúdo, codificação está incorreta
                     if rest_temp:
-                        raise Exception('ERROR: Data length is higher than expected.')
+                        print('ERROR: Data length is higher than expected.')
+                        sys.exit(1)
                 else:
                     data_tmp = hex_to_data(hex_elem, config.get('encode', None), config.get('decode', None))
                     validate_constraints(data_tmp, config, last_key)
@@ -798,6 +826,7 @@ def decode(hex_string, config_filename):
     # Descodificação da string hexadecimal e retorno dos dados originais
     data, hex_string = asn1_decode(hex_string, config)
     if hex_string:
-        raise Exception('ERROR: Data length is higher than expected.')
+        print('ERROR: Data length is higher than expected.')
+        sys.exit(1)
     
     return data

@@ -6,6 +6,13 @@ from mDL_transaction import mDL_transaction
 from data_groups import dg1
 from data_groups import dg6
 from data_groups import dg10
+from data_groups import ef_sod_parser
+from OpenSSL import crypto
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.exceptions import InvalidSignature
 
 DATA = None
 
@@ -20,66 +27,109 @@ if len(sys.argv) > 1:
             with open(FILENAME, "rb") as fd:
                 IMAGE = fd.read()
                 bt['bdb'] = IMAGE
+        FILENAME = DATA['ef_sod']['certificate']
+        with open(FILENAME, "rb") as fd:
+            CERT = fd.read()
+            DATA['ef_sod']['certificate'] = CERT
+        FILENAME = DATA['ef_sod']['signature']
+        with open(FILENAME, "rb") as fd:
+            KEY = fd.read()
+            DATA['ef_sod']['signature'] = KEY
 
-def calculate_digests(groups):
+def calculate_digests(groups, digestAlgorithm):
     digests = {}
     for id, group in groups.items():
-        digests[id] = group.hash('id-sha256')
+        digests[id] = group.hash(digestAlgorithm)
     return digests
 
-def verify_signature(digests, signature, algorithm):
-    signature = None
-
-    with open("certificates/certificate.der", "rb") as f:
-        cert = crypto.load_certificate(crypto.FILETYPE_ASN1, f.read())
+def verify_signature(digest, der_cert, signature, algorithm):
+    cert = x509.load_der_x509_certificate(der_cert, default_backend())
 
     public_key = cert.public_key()
 
-    digest = ''.join(digests.values())
-
-    if algorithm == 'id-pk-RSA-PKCS1-v1_5-SHA256':
-        return public_key.verify(
-            signature,
-            digest.encode(),
-            padding.PKCS1v15(),
-            hashes.SHA256()
-        )
-    elif algorithm == 'id-pk-RSA-PSS-v1_5-SHA256':
-        return public_key.verify(
-            signature,
-            digest.encode(),
-            padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
-            ),
-            hashes.SHA256()
-        )
-    else: 
-        raise Exception('ERROR: Signature algorithm not implemented.')
+    try:
+        if algorithm == 'id-pk-RSA-PKCS1-v1_5-SHA256':
+            public_key.verify(
+                signature,
+                digest.encode(),
+                padding.PKCS1v15(),
+                hashes.SHA256()
+            )
+        elif algorithm == 'id-pk-RSA-PSS-SHA256':
+            public_key.verify(
+                signature,
+                digest.encode(),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+        elif algorithm == 'id-pk-RSA-PKCS1-v1_5-SHA1':
+            public_key.verify(
+                signature,
+                digest.encode(),
+                padding.PKCS1v15(),
+                hashes.SHA1()
+            )
+        elif algorithm == 'id-pk-RSA-PSS-SHA1':
+            public_key.verify(
+                signature,
+                digest.encode(),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA1()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA1()
+            )
+        else:
+            print('ERROR: Signature algorithm not implemented.')
+            sys.exit(1)
+        return True
+    except InvalidSignature:
+        return False
 
 MDLT = mDL_transaction(DATA)
 MDLT.open()
 print()
+
 MDLT.request_additional_data(['61', '62'])
 print()
+
 transfer_data = MDLT.transfer_data(['61', '62'])
-print('DATA:',transfer_data)
+print('DATA:', transfer_data)
 print()
-transfer_signature = MDLT.transfer_signature()
-print('SIGNATURE:',transfer_signature)
+
+transfer_sod_data = MDLT.transfer_sod()
+print('SOD:', transfer_sod_data)
 print()
-transfer_digests = MDLT.transfer_digests()
-print('DIGESTS:',transfer_digests)
+
 dg1 = dg1.DG1(transfer_data[1])
 #dg6 = dg6.DG6(transfer_data[6])
 dg10 = dg10.DG10(transfer_data[10])
 dgs = {
-    1: dg1,
-    #6: dg6,
-    10: dg10
+  1: dg1,
+  #6: dg6,
+  10: dg10
 }
-digests = calculate_digests(dgs)
-print()
-print(digests)
-print('DIGESTS VALIDATION:',digests[1] == transfer_digests[1] and digests[10] == transfer_digests[10])
-print('SIGNATURE VALIDATION:',verify_signature(transfer_digests,transfer_signature), 'id-pk-RSA-PKCS1-v1_5-SHA256')
+
+transfer_digests = calculate_digests(dgs, transfer_sod_data['digestAlgorithm'])
+dig1 = transfer_sod_data['dataGroupHash'][0]['dataGroupHashValue']
+dig6 = transfer_sod_data['dataGroupHash'][1]['dataGroupHashValue']
+dig10 = transfer_sod_data['dataGroupHash'][2]['dataGroupHashValue']
+
+sod_digests = ''
+for dig in transfer_sod_data['dataGroupHash']:
+    sod_digests += str(dig['dataGroupHashValue'])
+
+print('DIGESTS VALIDATION:',
+        transfer_digests[1] == dig1 and\
+        #transfer_digests[6] == dig6 and\
+        transfer_digests[10] == dig10)
+
+print('SIGNATURE VALIDATION:', verify_signature(
+    sod_digests,
+    bytes(transfer_sod_data['certificate']),
+    bytes(transfer_sod_data['signature']),
+    transfer_sod_data['signatureAlgorithm'])
+)

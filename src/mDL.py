@@ -13,7 +13,7 @@ class mDL:
         '62': 10
     }
 
-    def __init__(self, data=None):
+    def __init__(self, password, data=None):
         """
         Parâmetros
         ----------
@@ -35,7 +35,7 @@ class mDL:
                 6: self.dg6,
                 10:self.dg10
             })
-            self.ef_sod.set_signature()
+            self.ef_sod.set_signature(password)
 
     def load(self):
         """ Carrega os dados do mDL dos ficheiros respetivos, codificados com ASN1."""
@@ -123,6 +123,12 @@ class mDL:
             if self.ef_groupAccess.is_allowed(num_dg):
                 data[num_dg] = self.get_dg(num_dg).get_data()
         return data
+
+    def get_sod_data(self):
+        return self.ef_sod.signed_data
+
+    def get_sod_data_hex(self):
+        return self.ef_sod.encode()
 
     def get_data_hex(self, data_group_tags):
         """Devolve os dados do mDL que se pretende aceder
