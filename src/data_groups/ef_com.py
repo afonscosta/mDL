@@ -73,18 +73,3 @@ class EF_COM:
         data['version'] = self.version
         data['tag_list'] = self.tag_list
         return data
-
-    def hash(self):
-        """ Calcula o valor de hash dos dados do DG1.
-
-        Retorna
-        -------
-        digest : str
-            valor de hash
-        """
-        data = self.version + self.version +\
-            "".join(self.tag_list) #TODO: está bem assim? divisores?
-            # self.number_of_entries + self.categories_of_vehicles (TODO: number_of_entries é preciso?)
-        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(data.encode())
-        return digest.finalize()

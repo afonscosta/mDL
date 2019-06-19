@@ -120,7 +120,7 @@ class DG6:
         """
         return asn1.encode(self, './data_groups/configs/dg6.json')
 
-    def hash(self):
+    def hash(self, oid):
         """ Calcula o valor de hash dos dados do DG1.
 
         Retorna
@@ -128,10 +128,12 @@ class DG6:
         digest : str
             valor de hash
         """
+        
         data = "".join([str(t.version) + str(t.bdb_owner) + str(t.bdb_type) + str(t.bdb)
                         for t in self.biometric_templates])
 
-        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(data.encode())
-        return digest.finalize()
-
+        if oid == 'id-sha256':
+            digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        else: raise Exception('ERROR: Hash algorithm not implemented.')

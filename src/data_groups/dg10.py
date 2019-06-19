@@ -102,7 +102,7 @@ class DG10:
         """
         return asn1.encode(self, './data_groups/configs/dg10.json')
 
-    def hash(self):
+    def hash(self, oid):
         """ Calcula o valor de hash dos dados do DG10.
 
         Retorna
@@ -117,6 +117,8 @@ class DG10:
             self.next_update,
             self.management_info
         ])
-        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(data.encode())
-        return digest.finalize()
+        if oid == 'id-sha256':
+            digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        else: raise Exception('ERROR: Hash algorithm not implemented.')

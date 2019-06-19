@@ -151,7 +151,7 @@ class DG1:
         data['categories_of_vehicles'] = self.categories_of_vehicles
         return data
 
-    def hash(self):
+    def hash(self, oid):
         """ Calcula o valor de hash dos dados do DG1.
 
         Retorna
@@ -159,12 +159,14 @@ class DG1:
         digest : str
             valor de hash
         """
-        data = self.family_name + self.name +\
-            self.date_of_birth + self.date_of_issue +\
-            self.date_of_expiry + self.issuing_country +\
-            self.issuing_authority + self.license_number +\
-            "".join(self.categories_of_vehicles) #TODO: está bem assim? divisores?
-            # self.number_of_entries + self.categories_of_vehicles (TODO: number_of_entries é preciso?)
-        digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(data.encode())
-        return digest.finalize()
+        if oid == 'id-sha256':
+            data = self.family_name + self.name +\
+                self.date_of_birth + self.date_of_issue +\
+                self.date_of_expiry + self.issuing_country +\
+                self.issuing_authority + self.license_number +\
+                "".join(self.categories_of_vehicles) +\
+                str(self.number_of_entries)
+            digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+            digest.update(data.encode())
+            return digest.finalize()
+        else: raise Exception('ERROR: Hash algorithm not implemented.')

@@ -63,7 +63,7 @@ class EF_SOD:
         for n, (id, group) in enumerate(groups.items()):
             data = parser.Data()
             data['dataGroupNumber'] = id
-            data['dataGroupHashValue'] = group.hash()
+            data['dataGroupHashValue'] = group.hash(self.signed_data['digestAlgorithm'])
             # TODO: Passar digestAlgorithm ao hash
             dgh.setComponentByPosition(n, data)
         self.signed_data['dataGroupHash'] = dgh
@@ -99,7 +99,7 @@ class EF_SOD:
                 hashes.SHA256()
             )
         else: 
-            raise Exception('ERROR: Algorithm not implemented.')
+            raise Exception('ERROR: Signature algorithm not implemented.')
         self.signed_data['signature'] = signature
 
     def get_signature(self):
